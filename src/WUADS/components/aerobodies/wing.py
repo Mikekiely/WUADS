@@ -1,10 +1,10 @@
 import warnings
 
-from src.WUADS.components.Component import physical_component
+from WUADS.components.component import PhysicalComponent
 import numpy as np
 
 
-class Wing(physical_component):
+class Wing(PhysicalComponent):
     """
     Class containing all the variables and method used for a wing component.
 
@@ -135,7 +135,7 @@ class Wing(physical_component):
         chords = np.linspace(self.cr, self.ct, n_strips+1)
         dy = .5 * self.span / n_strips
         rho = aircraft.cruise_conditions.rho
-        v = aircraft.cruise_conditions.v
+        v = aircraft.cruise_conditions.velocity
         m = aircraft.cruise_conditions.mach
         if m < .5 or aircraft.sref == 0:
             return 0

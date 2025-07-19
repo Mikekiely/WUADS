@@ -1,8 +1,8 @@
-from src.WUADS.components.Component import physical_component
+from WUADS.components.component import PhysicalComponent
 import numpy as np
 
 
-class Engine(physical_component):
+class Engine(PhysicalComponent):
     """
     Class containing all parameters and methods related to engine and nacelle component.
 

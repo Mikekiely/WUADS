@@ -1,4 +1,4 @@
-from src.WUADS.components.aerobodies.wing import Wing
+from WUADS.components.aerobodies.wing import Wing
 import numpy as np
 
 
@@ -68,7 +68,7 @@ class Horizontal(Wing):
         if aircraft.aircraft_type == 'transport':
             kh = 1.1
 
-            dive_speed = aircraft.cruise_conditions.v * .592484
+            dive_speed = aircraft.cruise_conditions.velocity * .592484
             a = 1.1 * self.area * kh
             b = 3.81
             c = self.area ** .2 * dive_speed

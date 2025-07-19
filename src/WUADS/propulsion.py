@@ -2,7 +2,7 @@ import warnings
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment
-from src.WUADS.Flight_Conditions import FlightConditions
+from WUADS.flight_conditions import FlightConditions
 import numpy as np
 
 

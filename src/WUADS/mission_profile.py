@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-from src.WUADS.flight_conditions import FlightConditions
+from WUADS.flight_conditions import FlightConditions
 import numpy as np
 
 class mission_segment:
@@ -44,7 +44,8 @@ class mission_segment:
 class takeoff(mission_segment):
     thrust_setting = 100
 
-    def __init__(self, thrust_setting, time):
+    def __init__(self, thrust_setting=100, time=0, title='takeoff', **kwargs):
+        self.title = title
         super().__init__()
         self.time = time
         self.thrust_setting = thrust_setting
@@ -96,8 +97,9 @@ class climb(mission_segment):
     max_thrust = 0
     K = 0
 
-    def __init__(self, aircraft, start_velocity, end_velocity, start_altitude, end_altitude, best_climb=False, power_available=0, **kwargs):
+    def __init__(self, title='climb', start_velocity=0, end_velocity=0, start_altitude=0, end_altitude=0, best_climb=False, **kwargs):
         super().__init__()
+        self.title = title
         self.__dict__.update(kwargs)
         self.best_climb = best_climb
         self.start_velocity = start_velocity
@@ -105,7 +107,6 @@ class climb(mission_segment):
         self.start_altitude = start_altitude
         self.end_altitude = end_altitude
         self.divisions = 1
-        self.power_available = power_available
         self.segment_type='climb'
 
         self.velocity = .293 * start_velocity + .707 * end_velocity
@@ -151,26 +152,13 @@ class climb(mission_segment):
         self.thrust = D
         delta_he = (self.end_altitude + 1 / (2 * g) * self.end_velocity ** 2) - (1 / (2 * g) * self.start_velocity ** 2)
 
-        #self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.altitude, self.flight_conditions.mach, self.thrust)
-        if aircraft.propulsion.engine_type == 'propeller':
-            self.sfc, max_thrust = aircraft.propulsion.analyze_performance(
-                self.altitude, self.mach,
-                horse_power=aircraft.propulsion.horse_power * .85,
-                fuel_consumption_rate=aircraft.propulsion.fuel_consumption_rate * 1.2
-            )
-        else:
-            self.sfc, max_thrust = aircraft.propulsion.analyze_performance(
-                self.altitude, self.mach, self.thrust
-            )
+        self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.altitude, self.flight_conditions.mach, self.thrust)
+
         if self.power_available > 0:
             pav = self.power_available / .0009478171 * .453592
             max_thrust = pav / self.velocity
 
         self.max_thrust = max_thrust
-        # self.sfc = .05
-        # if max_thrust < D:
-        #     # print('insufficient thrust')
-        #     max_thrust = D * 1.5
         self.weight_fraction = np.exp(
         -(self.sfc / 3600) * delta_he / (self.velocity * (1 - D / max_thrust)))
         climb_angle = np.arcsin(max_thrust / wi - D / wi)
@@ -191,7 +179,8 @@ class cruise(mission_segment):
     wn = 0
     range = None
 
-    def __init__(self, aircraft, mach, altitude, find_range=True, range=None):
+    def __init__(self, aircraft=None, mach=0, altitude=0, title='cruise', find_range=True, range=None, **kwargs):
+        self.title = title
         super().__init__()
         self.mach = mach
         self.altitude = altitude
@@ -222,19 +211,10 @@ class cruise(mission_segment):
         run_AVL(self.flight_conditions, aircraft)
         self.cl, self.cd = import_coefficients()
         self.lift_to_drag = self.cl / self.cd
-        #self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.flight_conditions.altitude,
-        #                                                               self.flight_conditions.mach,
-        #                                                               self.thrust)
-        if aircraft.propulsion.engine_type == 'propeller':
-            self.sfc, max_thrust = aircraft.propulsion.analyze_performance(
-                self.altitude, self.mach,
-                horse_power=aircraft.propulsion.horse_power * .65,
-                fuel_consumption_rate=aircraft.propulsion.fuel_consumption_rate
-            )
-        else:
-            self.sfc, max_thrust = aircraft.propulsion.analyze_performance(
-                self.altitude, self.mach, self.thrust
-            )
+        self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.flight_conditions.altitude,
+                                                                      self.flight_conditions.mach,
+                                                                      self.thrust)
+
         range_feet = self.range * 6076.12
         self.weight_fraction = np.exp(-range_feet * self.sfc / 3600 / (self.flight_conditions.velocity * self.lift_to_drag))
         if wi:
@@ -264,22 +244,11 @@ class cruise(mission_segment):
         sref = aircraft.sref
         D = self.cd * q * sref
         self.thrust = D
-        #self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.flight_conditions.altitude, self.flight_conditions.mach,
-        #                                               self.thrust)
-        if aircraft.propulsion.engine_type == 'propeller':
-            self.sfc, max_thrust = aircraft.propulsion.analyze_performance(
-                self.altitude, self.mach,
-                horse_power=aircraft.propulsion.horse_power * .65,
-                fuel_consumption_rate=aircraft.propulsion.fuel_consumption_rate
-            )
-        else:
-            self.sfc, max_thrust = aircraft.propulsion.analyze_performance(
-                self.altitude, self.mach, self.thrust
-            )
+        self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.flight_conditions.altitude, self.flight_conditions.mach,
+                                                      self.thrust)
 
-        # self.sfc = .657
+
         sfc = self.sfc / 3600
-        # sfc *= 2 # TODO Remove this
 
         self.range = np.log(self.weight_fraction) * self.flight_conditions.velocity * self.lift_to_drag / (-sfc) / 6076.12
         self.fuel_burnt = wi-wn
@@ -289,7 +258,8 @@ class cruise(mission_segment):
 
 
 class descent(mission_segment):
-    def __init__(self, weight_fraction):
+    def __init__(self, title='descent', weight_fraction=1, **kwargs):
+        self.title = title
         super().__init__()
         self.weight_fraction = weight_fraction
         self.segment_type = 'descent'
@@ -310,13 +280,13 @@ class descent(mission_segment):
 class loiter(mission_segment):
 
 
-    def __init__(self, altitude, time, mach=None):
+    def __init__(self, title='loiter', altitude=0, time=0, mach=None, **kwargs):
         """
         Initiate a loiter segment
         :param altitude: Loiter altitude (ft)
         :param time: Loiter time (hours)
         """
-
+        self.title = title
         super().__init__()
         self.altitude = altitude
         self.time = time
@@ -325,7 +295,7 @@ class loiter(mission_segment):
 
     def breguet_range(self, aircraft, wn):
         K = 0
-        for seg in aircraft.mission.mission_profile:
+        for seg in aircraft.Mission.mission_profile:
             if hasattr(seg, 'K'):
                 K = seg.K
                 self.mach = seg.mach
@@ -344,20 +314,11 @@ class loiter(mission_segment):
         self.cd = cd0 + K * self.cl**2
 
         self.thrust = self.cd * self.flight_conditions.q * aircraft.sref
-        #self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.flight_conditions.altitude,
-         #                                                              self.flight_conditions.mach,
-          #                                                             self.thrust)
+        self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.flight_conditions.altitude,
+                                                                      self.flight_conditions.mach,
+                                                                      self.thrust)
 
-        if aircraft.propulsion.engine_type == 'propeller':
-            self.sfc, max_thrust = aircraft.propulsion.analyze_performance(
-                self.altitude, self.mach,
-                horse_power=aircraft.propulsion.horse_power * .7,
-                fuel_consumption_rate=aircraft.propulsion.fuel_consumption_rate * .7
-            )
-        else:
-            self.sfc, max_thrust = aircraft.propulsion.analyze_performance(
-                self.altitude, self.mach, self.thrust
-            )
+
         self.lift_to_drag = self.cl / self.cd
         self.weight_fraction = np.exp(-E * self.sfc/3600 / self.lift_to_drag)
         self.wn = wn
@@ -371,15 +332,16 @@ class landing(mission_segment):
     wf_reserve = 0
     w_landing = 0
 
-    def __init__(self, weight_fraction, reserve_fuel):
+    def __init__(self, title='landing', weight_fraction=1, reserve_fuel=0, **kwargs):
+        self.title = title
         super().__init__()
         self.weight_fraction = weight_fraction
         self.wf_reserve = reserve_fuel
         self.segment_type = 'landing'
 
     def breguet_range(self, aircraft, wn):
-        self.reserve_fuel = aircraft.useful_load.w_fuel * self.wf_reserve
-        w_landing = aircraft.weight_takeoff - aircraft.useful_load.w_fuel + self.reserve_fuel
+        self.reserve_fuel = aircraft.UsefulLoad.w_fuel * self.wf_reserve
+        w_landing = aircraft.weight_takeoff - aircraft.UsefulLoad.w_fuel + self.reserve_fuel
         self.wn = w_landing
         self.wi = w_landing / self.weight_fraction
         self.power_required = 0
@@ -544,7 +506,7 @@ def mission_profile_report(aircraft, filename):
         f.write('================================================\n')
         # f.write(f'Maximum Range: {aircraft.}')
         f.write("{:>32} {:>19}\n".format('Range (nmi)', 'Fuel Burnt (lbs)'))
-        f.write("{:<15} {:>15.2f} {:>17}\n\n".format('Total', aircraft.range, aircraft.useful_load.w_fuel))
+        f.write("{:<15} {:>15.2f} {:>17}\n\n".format('Total', aircraft.range, aircraft.UsefulLoad.w_fuel))
 
         for seg in aircraft.mission_profile:
             f.write("{:<15} {:>15.2f} {:>17.2f}\n".format(seg.segment_type, float(seg.range), float(seg.fuel_burnt)))
@@ -567,7 +529,7 @@ def mission_profile_report(aircraft, filename):
             f.write("\t{:<{c1}}{:>{c2}.4f}\n".format('Cl', seg.cl, c1=c1, c2=c2))
             f.write("\t{:<{c1}}{:>{c2}.4f}\n\n".format('Cd', seg.cd, c1=c1, c2=c2))
 
-            f.write("\t{:<{c1}}{:>{c2}.2f}\n".format('altitdue', seg.altitude, c1=c1, c2=c2))
+            f.write("\t{:<{c1}}{:>{c2}.2f}\n".format('altitude', seg.altitude, c1=c1, c2=c2))
             f.write("\t{:<{c1}}{:>{c2}.4f}\n".format('Mach', seg.mach, c1=c1, c2=c2))
             f.write("\t{:<{c1}}{:>{c2}.4f}\n".format('Velocity (m/s)', seg.velocity, c1=c1, c2=c2))
             f.write("\t{:<{c1}}{:>{c2}.4f}\n\n".format('Time (min)', seg.time/60, c1=c1, c2=c2))

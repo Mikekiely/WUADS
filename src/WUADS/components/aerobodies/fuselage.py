@@ -1,8 +1,8 @@
-from src.WUADS.components.Component import physical_component
+from WUADS.components.component import PhysicalComponent
 import numpy as np
 
 
-class Fuselage(physical_component):
+class Fuselage(PhysicalComponent):
     """
     Class containing all methods and variables for fuselage.
     Used for ellipse shaped main fuselages.

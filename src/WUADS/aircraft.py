@@ -1,15 +1,28 @@
 import yaml
 import importlib
-from src.WUADS.components.Component import component
-from src.WUADS.components.Subsystems import subsystems
-from src.WUADS.Mission import mission
-from src.WUADS.components.Useful_Load import useful_load
-from src.WUADS.propulsion import turbofan, turbofan_LH2, propeller
-from src.WUADS.mission_profile import *
-from src.WUADS.flight_conditions import FlightConditions
+from src.WUADS.components.component import Component
+from WUADS.components.subsystems import Subsystems
+from WUADS.mission import Mission
+from WUADS.components.usefulload import UsefulLoad
+from WUADS.propulsion import turbofan, propeller
+from WUADS.mission_profile import *
+from WUADS.flight_conditions import FlightConditions
+from WUADS.components.aerobodies.wing import Wing
+from WUADS.components.aerobodies.fuselage import Fuselage
+from WUADS.components.aerobodies.horizontal import Horizontal
+from WUADS.components.aerobodies.vertical import Vertical
+from WUADS.components.aerobodies.engine import Engine
+import warnings
 
+AEROBODY_CLASSES = {
+    "wing": Wing,
+    "fuselage": Fuselage,
+    "horizontal": Horizontal,
+    "vertical": Vertical,
+    "engine": Engine
+}
 
-class Aircraft:
+class aircraft:
     """
     Class for whole aircraft analysis
 
@@ -23,12 +36,12 @@ class Aircraft:
 
     title = ''
     aero_components = {}
-    cruise_conditions = {}      # Flight conditions at cruise
-    sref = 0                    # Reference Area (ft^2)
-    cd0 = 0                     # Parasite Drag coefficient
-    cdw = 0                     # Wave drag coefficient
+    cruise_conditions = {}  # Flight conditions at cruise
+    sref = 0  # Reference Area (ft^2)
+    cd0 = 0  # Parasite Drag coefficient
+    cdw = 0  # Wave drag coefficient
 
-    misc_components = {}        # Miscellaneous Components
+    misc_components = {}  # Miscellaneous Components
 
     cg = [0, 0, 0]
     cg_empty = [0, 0, 0]
@@ -36,17 +49,17 @@ class Aircraft:
     _n_engines = 2
 
     _lock_component_weights = False  # Locks component weights so editing the aircraft doesn't change them
-    _h_cruise = 0   # Cruise Altitude
-    _m_cruise = 0   # Cruise Mach number
+    _h_cruise = 0  # Cruise Altitude
+    _m_cruise = 0  # Cruise Mach number
 
-    weight_takeoff = 0          # Takeoff Gross Weight (lbs)
-    weight_empty = 0            # Empty weight, no fuel, no cargo, no crew
-    weight_max = 0              # Max Takeoff weight
-    weight_reference = 0        # Reference weight used to calculate component weights, typically the same as weight_max
+    weight_takeoff = 0  # Takeoff Gross Weight (lbs)
+    weight_empty = 0  # Empty weight, no fuel, no cargo, no crew
+    weight_max = 0  # Max Takeoff weight
+    weight_reference = 0  # Reference weight used to calculate component weights, typically the same as weight_max
 
-    _w_cargo = 0                # Cargo weight
-    _w_fuel = 0                 # Fuel Weight
-    _n_z = 0                    # Ultimate load
+    _w_cargo = 0  # Cargo weight
+    _w_fuel = 0  # Fuel Weight
+    _n_z = 0  # Ultimate load
 
     subsystems = []
     useful_load = None
@@ -55,8 +68,7 @@ class Aircraft:
     propulsion = None
     aircraft_type = 'transport'
 
-    def __init__(self, config_file, mission_profile=None
-                 , wdg_guess=100000):
+    def __init__(self, config_file, wdg_guess=100000):
         """
         Initialize aircraft from config file
         Sets weight and parasite drag
@@ -74,6 +86,8 @@ class Aircraft:
         """
         Reads input YAML file and initializes aircraft and declared components
         """
+
+        self.mission = Mission(self)
         with open(self.input_file) as f:
             config = yaml.safe_load(f)
 
@@ -92,92 +106,406 @@ class Aircraft:
                     self._n_z = variable_value
 
             # Set useful load weights
-            self.useful_load = useful_load(config.get("aircraft", {}))
+            self.useful_load = UsefulLoad(config.get("aircraft", {}))
 
             # Initialize defined aerodynamic components with given parameters
             for component_type, params in config.get("components", {}).items():
-                class_name = f"{component_type.capitalize()}"
-                # try:
-                # Retrieve the class of the declared component and initialize
-                # TODO error exception on this (finish all component classes first)
-                module_name = f"WUADS.components.aerobodies.{component_type.lower()}"
-                module = importlib.import_module(module_name)
-
-                component_class = getattr(module, class_name)
-                component = component_class(params)
-                component.title = component.title.title()
-                self.aero_components[component.title] = component_class(params)
-                # except Exception as e:
-                #     print(e)
-                #     print(f"Warning: Class for '{class_name}' not found, component ignored")
+                component_class = AEROBODY_CLASSES.get(component_type.lower())
+                if 'title' not in params:
+                    params['title'] = component_type
+                try:
+                    self.aero_components[params['title']] = component_class(params)
+                except TypeError:
+                    warnings.warn(f'Component type {component_type} not found, the valid component types are as follows: {AEROBODY_CLASSES.keys()}')
 
             # Set subsystem parameters for weight estimation
             subsystem_parameters = {}
             for parameter, value in config.get("subsystem_parameters", {}).items():
                 subsystem_parameters[parameter] = value
-            self.subsystems = subsystems(subsystem_parameters)
+            self.subsystems = Subsystems(subsystem_parameters)
 
             # general conditions set-up
             self.cruise_conditions = FlightConditions(self.h_cruise, self.mach_cruise)
             self.sref = self.aero_components['Main Wing'].area
-            self.mission = mission(config.get('aircraft'), aircraft=self)  # change this? mission(mission_profile)
 
             if not 'Main Wing' in self.aero_components:
                 raise AttributeError('Main Wing component not declared')
 
-            # Propulsion parameters
-            propulsion_parameters = config.get("propulsion", {})
-
-            engine_type = self.aero_components['Nacelle'].engine_type
+            # Propulsion parameterse
 
             # try:
-            if engine_type in ['turbofan', 'turbofan_LH2']:
-                if 'thrust_sea_level' in propulsion_parameters:
-                    thrust_sea_level = propulsion_parameters['thrust_sea_level']
-                else:
-                    thrust_sea_level = None
+            propulsion_parameters = config.get("propulsion", {})
 
-                if 'thrust_cruise' in propulsion_parameters:
-                    thrust_cruise = propulsion_parameters['thrust_cruise']
-                else:
-                    thrust_cruise = None
+            self.cruise_conditions = FlightConditions(self.h_cruise, self.mach_cruise)
+            self.sref = self.aero_components['Main Wing'].area
+            self.propulsion = self.generate_propulsion(n_engines=self.n_engines,
+                                                       **propulsion_parameters)
 
-                if 'sfc_sea_level' in propulsion_parameters:
-                    sfc_sea_level = propulsion_parameters['sfc_sea_level']
-                else:
-                    sfc_sea_level = None
+            mission_profile_params = config.get("mission_profile", None)
+            self.mission.generate_mission_profile(mission_profile_params)
 
-                if 'sfc_cruise' in propulsion_parameters:
-                    sfc_cruise = propulsion_parameters['sfc_cruise']
-                else:
-                    sfc_cruise = None
+    def generate_propulsion(self, n_engines=None, set_engine=True, **kwargs):
+        """
+        Sets aircraft propulsion to a turbofan engine with specified values
+        :param int n_engines:  Number of engines
+        :param float thrust_sea_level:  Maximum available thrust at sea level
+        :param float sfc_sea_level:  Specific fuel consumption at sea level
+        :param float thrust_cruise:  Maximum available thrust at cruise
+        :param sfc_cruise:  Specific fuel consumption at cruise
+        """
+        if not 'engine_type' in kwargs:
+            warnings.warn('Engine Type is not declared in propulsion parameters, defaulting to turbofan')
+            engine_type = 'turbofan'
+        else:
+            engine_type = kwargs['engine_type']
 
-                self.propulsion = self.generate_propulsion(
-                    n_engines=self.n_engines,
-                    thrust_cruise=thrust_cruise,
-                    thrust_sea_level=thrust_sea_level,
-                    sfc_sea_level=sfc_sea_level,
-                    sfc_cruise=sfc_cruise,
-                    engine_type=engine_type
-                )
+        if n_engines:
+            self.n_engines = n_engines
 
-            elif engine_type == 'propeller':
-                if 'horse_power' in propulsion_parameters:
-                    horse_power = propulsion_parameters['horse_power']
+        if engine_type.lower() == 'turbofan':
+            thrust_sea_level = kwargs.get('thrust_sea_level', None)
+            thrust_cruise = kwargs.get('thrust_cruise', None)
+            sfc_sea_level = kwargs.get('sfc_sea_level', None)
+            sfc_cruise = kwargs.get('sfc_cruise', None)
+
+            engine = turbofan(h_cruise=self.h_cruise,
+                              mach_cruise=self.mach_cruise,
+                              n_engines=self.n_engines,
+                              thrust_sea_level=thrust_sea_level,
+                              thrust_cruise=thrust_cruise,
+                              sfc_sea_level=sfc_sea_level,
+                              sfc_cruise=sfc_cruise)
+        elif engine_type.lower() == 'propeller':
+            horse_power = kwargs.get('horse_power', None)
+            fuel_consumption_rate = kwargs.get('fuel_consumption_rate', None)
+            if not horse_power:
+                warnings.warn('Please enter a base horsepower for propeller engine')
+            if not fuel_consumption_rate:
+                warnings.warn('Please enter a fuel consumption rate for propeller engine')
+            engine = propeller(
+                n_engines=n_engines,
+                horse_power=horse_power,
+                fuel_consumption_rate=fuel_consumption_rate
+            )
 
 
+        if set_engine:
+            self.propulsion = engine
 
-                else:
-                    horse_power = None
+        return engine
 
-                if 'fuel_consumption_rate' in propulsion_parameters:
-                    fuel_consumption_rate = propulsion_parameters['fuel_consumption_rate']
-                else:
-                    fuel_consumption_rate = None
+    def set_cd0(self):
+        """
+        Calculates each components parasite drag coefficient and sets the overall aircraft drag coefficient
+        """
+        # https://arc.aiaa.org/doi/abs/10.2514/1.47557
 
-                self.propulsion = self.generate_propulsion(
-                    n_engines=self.n_engines,
-                    horse_power=horse_power,
-                    fuel_consumption_rate=fuel_consumption_rate,
-                    engine_type=engine_type
-                )
+        cd0, cdw = self.get_cd0()
+        self.cd0 = cd0
+        self.cdw = cdw
+
+    def get_cd0(self, height=None, mach=None):
+        # https://arc.aiaa.org/doi/abs/10.2514/1.47557
+
+        if height == None:
+            height = self.h_cruise
+        if mach == None:
+            mach = self.mach_cruise
+
+        cd0 = 0
+        cdw = 0
+        fc = FlightConditions(height, mach)
+        for comp in self.aero_components.values():
+            comp.parasite_drag(fc, self.sref)
+            cd0 += comp.cd0
+            cdw += comp.set_wave_drag(self)
+        return cd0, cdw
+
+    def set_weight(self, wdg_guess=None, fudge_factor=1.06):
+        """
+        Uses and iterative loop to set all component weights and overall weight
+
+        Parameters: wdg_guess: Initial guess for gross design weight (lbs)
+        fudge_factor: <float> Margin to multiply overall weight by. Good practice to leave at ~1.06 to account
+                              for various un modelled weights
+        """
+        if not wdg_guess:
+            wdg_guess = self.weight_takeoff
+        self.weight_takeoff = 1
+        margin = .00001
+        # Start iterative loop
+        max_iter = 100
+
+        if self.lock_component_weights:
+            wdg_guess = self.weight_max
+
+        for i in range(max_iter):
+            # Set structural component weights
+            self.weight_takeoff = 0
+            for comp in self.aero_components.values():
+                self.weight_takeoff += comp.set_weight(self, wdg_guess)
+                comp.set_cg()
+
+            for comp in self.misc_components.values():
+                self.weight_takeoff += comp.weight
+
+            # Set subsystem Weights
+            self.weight_takeoff += self.subsystems.set_subsystem_weights(self, wdg_guess)
+
+            # Add fudge factor
+            self.weight_takeoff *= fudge_factor
+
+            # The current weight is the empty weight
+            self.weight_empty = self.weight_takeoff
+            # Add useful load
+            self.useful_load.set_weight(self)
+            self.weight_takeoff += self.useful_load.weight
+            self.weight_empty += self.useful_load.w_pilots * 1.65 + self.useful_load.w_flight_attendants * 1.65
+
+            # Check if converged
+            if np.abs((wdg_guess - self.weight_takeoff) / self.weight_takeoff) < margin or self.lock_component_weights:
+                break
+
+            # adjust wdg guess
+            wdg_guess = wdg_guess + (self.weight_takeoff - wdg_guess) * .75
+
+        # Set moments of inertia and cg
+        self.inertia = [0, 0, 0]
+        for comp in self.aero_components.values():
+            self.inertia = [i + ix for i, ix in zip(self.inertia, comp.inertia)]
+        for comp in self.misc_components.values():
+            self.inertia = [i + ix for i, ix in zip(self.inertia, comp.inertia)]
+
+        if not self.lock_component_weights:
+            self.weight_max = self.weight_takeoff
+
+        self.inertia = [i + ix for i, ix in zip(self.inertia, self.subsystems.inertia)]
+        # Set cg
+        self.cg_empty = [i / (self.weight_empty / fudge_factor) for i in self.inertia]
+
+        self.inertia = [i + ix for i, ix in zip(self.inertia, self.useful_load.inertia)]
+        self.cg = [i / (self.weight_empty / fudge_factor + self.useful_load.weight) for i in self.inertia]
+
+    def update_component(self, variables, maintain_aspect_ratio=False):
+        """
+        Updates component and recalculates weight and parasite drag
+
+        Parameters:
+            variables: List of variables to update, formatted as tuples with the following format (component, variable, value)
+                      example:
+                      [('Main Wing', 'Sweep', 25),
+                       ('Horizontal', 'Area', 430),
+                       ('Fuselage', 'Length', 120)]
+            maintain_aspect_ratio: if set to true and the area is altered, the span will be altered to maintain the current
+                                   aspect ratio
+        """
+        # cast variables to list if its just a single tuple
+        if not isinstance(variables, list):
+            variables = [variables]
+        # Set variables
+        for var in variables:
+            title = var[0]
+            variable = var[1]
+            value = var[2]
+            # Check if title is in aero components
+            if title in self.aero_components:
+                self.aero_components[title].update(variable, value, maintain_aspect_ratio=maintain_aspect_ratio)
+
+        # Re-initialize the weights and drag
+        self.sref = self.aero_components['Main Wing'].area
+        self.set_weight()
+        self.set_cd0()
+
+    def add_component(self, component_type, params):
+        """
+        Adds component with a given set of parameters
+
+        component_type: str
+        params: dict
+        """
+        class_name = f"{component_type.capitalize()}"
+        module_name = f"WUADS.components.aerobodies.{component_type.lower()}"  # TODO Make this so it can add a non physical component
+        module = importlib.import_module(module_name)
+        component_class = getattr(module, class_name)
+        component = component_class(params)
+        self.aero_components[component.title] = component_class(params)
+        self.set_weight()
+        self.set_cd0()
+
+    def remove_component(self, component):
+        """Removes a component and updates parameters"""
+        # for key in self.aero_components.keys():
+        #     if key.lower() == component.lower():
+        #         component = key
+
+        del self.aero_components[component]
+        self.set_weight()
+        self.set_cd0()
+
+    def write_config_file(self, file_name=None):
+        """ Write a .yaml file to save the aircraft's variables """
+        component_list = {}
+        for comp in self.aero_components.values():
+            params = {}
+            for param in comp.params.keys():
+                if hasattr(comp, param):
+                    val = getattr(comp, param)
+                    try:
+                        val = float(val)
+                    except:
+                        pass
+
+                    if param.startswith('sweep') or param.startswith('dihedral'):
+                        val *= 180 / np.pi
+
+                    params[param] = val
+
+            component_list[comp.component_type] = params
+
+        subcomp_list = {}
+        for comp in self.subsystems.components.values():
+            subcomp_list[comp.title] = [float(x) for x in comp.cg]
+
+        subsystem_params = {'subsystems': subcomp_list,
+                            'n_nose_wheels': self.subsystems.parameters['n_nose_wheels'],
+                            'n_main_wheels': self.subsystems.parameters['n_main_wheels'],
+                            'n_tanks': self.subsystems.parameters['n_tanks'],
+                            'w_avionics': self.subsystems.parameters['w_avionics']
+                            }
+
+        propulsion_params = {'thrust_sea_level': self.propulsion.thrust_sea_level,
+                             'thrust_cruise': self.propulsion.thrust_cruise,
+                             'sfc_sea_level': self.propulsion.sfc_sea_level,
+                             'sfc_cruise': self.propulsion.sfc_cruise}
+
+        data = {
+            'aircraft': {
+                'title': self.title,
+                'altitude': self.h_cruise,
+                'mach': self.mach_cruise,
+                'max_mach': self.mission.max_mach,
+                'ultimate_load': self.ultimate_load,
+                'w_fuel': self.mission.w_fuel,
+                'cg_fuel': self.useful_load.cg_fuel,
+                'rho_fuel': self.mission.rho_fuel,
+                'n_passengers': self.mission.n_passengers,
+                'cg_passengers': self.useful_load.cg_passengers,
+                'n_pilots': self.mission.n_pilots,
+                'n_flight_attendants': self.mission.n_flight_attendants,
+                'cg_crew': self.useful_load.cg_flight_attendants,
+                'w_cargo': self.w_cargo,
+                'cg_cargo': self.useful_load.cg_cargo,
+                'design_range': self.mission.design_range,
+                'n_engines': self.n_engines
+            },
+            'components': component_list,
+            'subsystem_parameters': subsystem_params,
+            'propulsion': propulsion_params,
+
+        }
+
+        if not file_name:
+            file_name = self.input_file
+
+        with open(file_name, 'w') as file:
+            yaml.dump(data, file, default_flow_style=False)
+
+    def add_misc_weight(self, title, weight, cg=None):
+        """
+        Adds a miscellaneous point weight to the aircraft, held in aircraft.misc_components
+
+        :param title: <str> Title of the new component
+        :param weight: <float> Weight of the component (lbs)
+        :param cg: <[float, float, float]> Component center of gravity, [x, y, z]. Defaults to the cg of the plane if not entered
+        """
+
+        if not cg:
+            cg = self.cg
+        self.misc_components[title] = Component({'title': title, 'weight': weight, 'cg': cg})
+        self.set_weight()
+
+    @property
+    def w_cargo(self):
+        return self._w_cargo
+
+    @w_cargo.setter
+    def w_cargo(self, weight):
+        """
+        Updates the cargo weight of the aircraft to test out performance at different loading conditions
+        :param cargo_weight: new cargo weight (lbs)
+        """
+        self._w_cargo = weight
+        if self.weight_max > 0:
+            self.useful_load.w_cargo = weight
+            self.set_weight()
+
+    @property
+    def w_fuel(self):
+        return self._w_fuel
+
+    @w_fuel.setter
+    def w_fuel(self, weight):
+        self._w_fuel = weight
+        if self.weight_max > 0:
+            self.mission.w_fuel = weight
+            self.useful_load.w_fuel = weight
+            self.set_weight()
+
+    @property
+    def n_engines(self):
+        return self._n_engines
+
+    @n_engines.setter
+    def n_engines(self, n):
+        for comp in self.aero_components.values():
+            if comp.component_type == 'Nacelle':
+                comp.n_engines = n
+        try:
+            self.propulsion.n_engines = n
+        except AttributeError:
+            pass
+        self._n_engines = n
+        if self.weight_max > 0:
+            self.set_weight()
+
+    @property
+    def lock_component_weights(self):
+        return self._lock_component_weights
+
+    @lock_component_weights.setter
+    def lock_component_weights(self, x):
+        if x:
+            self.weight_max = self.weight_takeoff
+        self._lock_component_weights = x
+
+    @property
+    def h_cruise(self):
+        return self._h_cruise
+
+    @h_cruise.setter
+    def h_cruise(self, x):
+        self._h_cruise = x
+        self.mission.altitude = x
+        self.cruise_conditions = FlightConditions(x, self.mach_cruise)
+        self.set_cd0()
+
+    @property
+    def mach_cruise(self):
+        return self._m_cruise
+
+    @mach_cruise.setter
+    def mach_cruise(self, x):
+        self._m_cruise = x
+        self.mission.mach = x
+        self.cruise_conditions = FlightConditions(self.h_cruise, x)
+        self.set_cd0()
+
+    @property
+    def ultimate_load(self):
+        return self._n_z
+
+    @ultimate_load.setter
+    def ultimate_load(self, nz):
+        self._n_z = nz
+        if hasattr(self.mission, 'ultimate_load'):
+            self.mission.ultimate_load = nz

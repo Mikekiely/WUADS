@@ -2,7 +2,7 @@ import warnings
 import numpy as np
 
 
-class component:
+class Component:
     """
     Super Class for all components
 
@@ -73,7 +73,7 @@ class component:
         pass
 
 
-class physical_component(component):
+class PhysicalComponent(Component):
     """
     Component which effects aerodynamic performance of the aircraft
     """
@@ -115,7 +115,7 @@ class physical_component(component):
         # Parasite drag calculation - From Raymer
         # L is the characteristic length
         rho = flight_conditions.rho
-        v = flight_conditions.v
+        v = flight_conditions.velocity
         mu = flight_conditions.mu
         mach = flight_conditions.mach
         Re = rho * v * l_char / mu

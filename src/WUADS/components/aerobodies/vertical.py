@@ -85,7 +85,7 @@ class Vertical(Wing):
         else:
             kv = 1
 
-        dive_speed = aircraft.cruise_conditions.v * .592484
+        dive_speed = aircraft.cruise_conditions.velocity * .592484
         a = kv * self.area * 3.81
         b = (self.area ** .2 * dive_speed) / (1000 * np.cos(self.sweep_mid) ** .5)
         self.weight_torenbeek = a * b ** -.281
