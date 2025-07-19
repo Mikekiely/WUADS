@@ -78,7 +78,7 @@ class PhysicalComponent(Component):
     Component which effects aerodynamic performance of the aircraft
     """
     # Default Values
-    sections = []  # Sections to input into AVL
+    _avl_sections = []  # Sections to input into AVL
     attachment = ""  # What component is this attached to, eg. nacelle attached to wing
     cd0 = 0.0  # Parasite drag coefficient
     cdw = 0.0  # Wave drag coefficient

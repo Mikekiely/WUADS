@@ -1,7 +1,7 @@
 Units: Imperial       # "SI" or "Imperial"
 
 aircraft:
-  title: 'b737-800'
+  title: 'b737-800'         # Used for output file prefix
   altitude: 35000           # Altitude at cruise
   mach: 0.8                 # Mach number at cruise
   max_mach: .82             # Maximum mach number at cruise

@@ -22,7 +22,7 @@ AEROBODY_CLASSES = {
     "engine": Engine
 }
 
-class aircraft:
+class Aircraft:
     """
     Class for whole aircraft analysis
 
@@ -68,6 +68,9 @@ class aircraft:
     propulsion = None
     aircraft_type = 'transport'
 
+    output_dir = None
+    _file_prefix = None
+
     def __init__(self, config_file, wdg_guess=100000):
         """
         Initialize aircraft from config file
@@ -81,6 +84,7 @@ class aircraft:
         self.load_config()
         self.set_weight(wdg_guess=wdg_guess)
         self.set_cd0()
+        self.output_dir = os.path.join(os.getcwd(), "output")
 
     def load_config(self):
         """
@@ -509,3 +513,32 @@ class aircraft:
         self._n_z = nz
         if hasattr(self.mission, 'ultimate_load'):
             self.mission.ultimate_load = nz
+
+    @property
+    def file_prefix(self):
+        return self._file_prefix
+
+    @file_prefix.setter
+    def file_prefix(self, prefix):
+        # check if there's invalid characters in the file prefix
+        invalid_chars = r'<>:"/\\|?*'
+        if any(char in prefix for char in invalid_chars):
+            warnings.warn('file name contains invalid characters')
+            return False
+
+        # Reserved Windows filenames
+        reserved_names = {
+            "CON", "PRN", "AUX", "NUL",
+            *(f"COM{i}" for i in range(1, 10)),
+            *(f"LPT{i}" for i in range(1, 10))
+        }
+        name_upper = os.path.splitext(prefix)[0].upper()
+        if name_upper in reserved_names:
+            warnings.warn('file name is reserved')
+            return False
+
+        # Don't allow path separators
+        if os.sep in prefix or (os.altsep and os.altsep in prefix):
+            warnings.warn('file name is invalid, please do not use "/"')
+            return False
+        self._file_prefix = prefix

@@ -58,14 +58,13 @@ class Mission:
                 self.mission_profile.append(seg_class(aircraft=self.aircraft, title=name, **seg))
 
 
-    def run_case_updated(self, aircraft):
+    def run_case(self):
         """
         Runs mission profile calculations using the user-defined mission profile.
         Assumes self.mission_profile is already populated with valid mission segments.
         """
-
+        aircraft = self.aircraft
         mission_profile = self.mission_profile  # use the existing mission profile defined by user
-
         wi = aircraft.weight_takeoff
 
         # Forward loop: compute weight fractions and range up to the find_range segment
@@ -79,18 +78,19 @@ class Mission:
                 seg.breguet_range(aircraft, wi)
                 wi *= seg.weight_fraction
 
-        # Backward loop: compute wi for segments after find_range
-        wn = aircraft.weight_takeoff - aircraft.useful_load.w_fuel
-        for seg in reversed(mission_profile):
-            if seg.find_range:
-                break
-            else:
-                seg.breguet_range(aircraft, wn)
-                wn = seg.wi
+        if seg_findrange is None:
+            pass
+        else:
+            # Backward loop: compute wi for segments after find_range
+            wn = aircraft.weight_takeoff - aircraft.useful_load.w_fuel
+            for seg in reversed(mission_profile):
+                if seg.find_range:
+                    break
+                else:
+                    seg.breguet_range(aircraft, wn)
+                    wn = seg.wi
 
-        # Compute the range for the find_range segment
-        if seg_findrange is not None:
-            seg_findrange.set_range(aircraft, wi, wn)
+                seg_findrange.set_range(aircraft, wi, wn)
 
         # Sum total mission range
         max_range = sum(seg.range for seg in mission_profile)

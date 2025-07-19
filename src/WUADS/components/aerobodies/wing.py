@@ -81,24 +81,27 @@ class Wing(PhysicalComponent):
         self.dihedral = np.deg2rad(self.dihedral)
 
         # Create sections used for AVL Analysis
-        self.sections = [[xle, yle, zle, self.cr, 0],
+        self._avl_sections = [[xle, yle, zle, self.cr, 0],
                               [(xle + cr / 4) + b * np.tan(self.sweep) - self.ct / 4, b + yle, zle + b * \
                           np.tan(self.dihedral), ct, 0]]
 
         # Add winglet if exists
         winglet = params.get('winglet', None)
         if winglet is not None:
-            section1 = self.sections[1]
+            section1 = self._avl_sections[1]
             sweep = winglet['sweep']
             height = winglet['height']
             dihedral = winglet['dihedral']
             ct_wl = winglet['ct']
-            self.sections.append([section1[0] + np.tan(sweep) * height, section1[1] + height/np.tan(dihedral), section1[2] + height, ct_wl, 0])
+            self._avl_sections.append([section1[0] + np.tan(sweep) * height, section1[1] + height / np.tan(dihedral), section1[2] + height, ct_wl, 0])
 
         # Set wetted surface area (Torenbeek - advanced aircraft design)
         kq = 0.95
         Qw = kq * self.tc * self.area * np.sqrt(self.area / self.aspect_ratio) / np.sqrt(1 + t)
         self.s_wet = (2 + .5 * self.tc) * (Qw * np.sqrt(self.aspect_ratio * (1 + t)) / (kq * self.tc)) ** (2 / 3)
+
+        # Set airfoils and twist
+
 
     def parasite_drag(self, flight_conditions, sref):
         """

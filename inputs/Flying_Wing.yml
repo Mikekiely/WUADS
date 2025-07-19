@@ -1,0 +1,118 @@
+aircraft:
+  title: 'flying_wing'
+  altitude: 35000           # Altitude at cruise
+  mach: 0.82                 # Mach number at cruise
+  max_mach: .82             # Maximum mach number at cruise
+  ultimate_load: 3.9        # Ultimate Load Factor (g's)
+  w_fuel: 67000             # Fuel Weight
+  cg_fuel: [37.116, 0, 0]       # Fuel center of gravity (Optional)
+  rho_fuel: 6.8             # Fuel density (lbs/gal) (Optional)
+  n_passengers: 0           # number of passengers (Optional)
+  cg_passengers: [58, 0, 0] # Center of gravity for passengers (Optional)
+  n_pilots: 2               # Number of pilots (Optional)
+  n_flight_attendants: 0    # Number of flight attendants (Optional)
+  cg_crew: [9, 0, 0]        # Center of gravity for the crew (Optional)
+  w_cargo: 55000            # Cargo Weight (Optional)
+  cg_cargo: [54, 0, 0]      # Center of gravity for cargo (Optional)
+  design_range: 2000        # Design range (nmi)
+  n_engines: 10             # number of engines
+
+components:
+  wing_advanced:
+    # Required Inputs
+    title: 'Main Wing'
+    definition_type: "Sections"
+    sections:
+      section_1:
+        cr: 63.42
+        ct: 35.41
+        span: 40
+        sweep: 35
+        sweep_location: 0
+        dihedral: 0
+      section_2:
+        ct: 8.24
+        span: 66
+        sweep: 35
+        sweep_location: 0
+        dihedral: 0
+    airfoils:
+      root:
+        twist: 0
+        airfoil: 'eh2020-il.dat'
+      mid:
+        twist: 1
+        airfoil: 'eh2020-il.dat'
+      tip:
+        twist: 3
+        airfoil: 'eh2020-il.dat'
+
+    xle: 0                  # X value at leading edge
+    yle: 0                  # Y value at leading edge
+    zle: 0                  # Z value at leading edge
+
+    # Optional Inputs
+    twist: [0, 1, 3]
+    laminar_percent: .1         # Percentage of chord experiencing laminar flow
+    control_surface_ratio: .15   # Percentage of the chord which has a control surface (used for weights
+
+  vertical:
+    title: 'Vertical Stabilizer'
+    span: 12.25
+    cr: 9.60
+    ct: 6.72
+    sweep: 35
+    sweep_location: 0
+    dihedral: 90
+    xle: 56.5
+    yle: 0
+    zle: 6.66
+
+  fuselage:
+    # Required Inputs
+    title: 'Fuselage'
+    length: 0      # Fuselage length (ft)
+    width: 0        # Fuselage Width (ft)
+    height: 0       # Fuselage height (ft)
+
+  nacelle:
+    # Contains weight properties for engine, nacelle, and all propulsive subcomponents and drag properties for nacelle
+    # Required Inputs
+    title: 'Nacelle'
+    length: 16.42
+    diameter: 4
+    xle: [25.46, 25.46, 25.46, 25.46, 25.46]
+    yle: [21, 25, 29, 33, 37]
+    zle: [0, 0, 0, 0, 0]
+    n_engines: 10
+    engine_type: 'turbofan'
+    w_engine: 4020
+    attachment: 'Main Wing'    # What component is this attached to - make sure it is the title of a component declared earlier
+
+propulsion:
+  engine_type: 'turbofan'
+
+
+subsystem_parameters:
+  subsystems: # Subsystems and their centers of gravity
+    nose_landing_gear: [25.75, 0, -6]
+    main_landing_gear: [41.58, 0, -6]
+    air_conditioning: [16, 0, 0]
+    anti_ice: [41.67, 0, 0]
+    apu: [25, 0, 0]                  # Auxiliary Power Unit
+    avionics: [12.25, 0, 0]
+    electronics: [20, 0, 0]
+    flight_controls: [67, 0, 0]        # cg calculated automatically
+    furnishings: [30.58, 0, 0]
+    hydraulics: [25, 0, 0]
+    instruments: [12.25, 0, 0]
+
+  # Landing gears
+  n_nose_wheels: 2    # Number of wheels on nose landing gear (Optional)
+  n_main_wheels: 4    # Number of wheels on main landing gear (Optional)
+  height: 6           # landing gear height (ft) (Optional)
+
+  # Fuel tanks
+  n_tanks: 3          # Total number of fuel tanks
+
+  w_avionics: 792    # Weight of uninstalled avionics
