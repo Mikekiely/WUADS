@@ -74,7 +74,7 @@ components:
     wfw: None               # weight of fuel in wings (if None then all weight is in wings)
 
 
-  nacelle:
+  engine:
     # Contains weight properties for engine, nacelle, and all propulsive subcomponents and drag properties for nacelle
     # Required Inputs
     title: 'Nacelle'
@@ -91,7 +91,6 @@ components:
 
 propulsion:
   engine_type: 'turbofan'   # Turbofan of propeller currently
-  n_engines: 2
 
 subsystem_parameters:
   subsystems: # Subsystems and their centers of gravity
@@ -117,6 +116,44 @@ subsystem_parameters:
 
   w_avionics: 1200    # Weight of uninstalled avionics
 
-
+mission_profile:
+  takeoff_1:
+    segment_type: takeoff
+    thrust_setting: 75
+    time: 30
+  takeoff_2:
+    segment_type: takeoff
+    thrust_setting: 75
+    time: 30
+  climb_1:
+    segment_type: climb
+    start_velocity: 150
+    end_velocity: 200
+    start_altitude: 0
+    end_altitude: 10000
+  climb_2:
+    segment_type: climb
+    start_velocity: 200
+    end_velocity: 500
+    start_altitude: 10000
+    end_altitude: 22000
+  climb_3:
+    segment_type: climb
+    start_velocity: 500
+    end_velocity: 550
+    start_altitude: 22000
+    end_altitude: 36000
+  cruise:
+    segment_type: cruise
+    mach: .85
+    altitude: 35000
+    find_range: True
+  descent:
+    segment_type: descent
+    weight_fraction: .95
+  landing:
+    segment_type: descent
+    weight_fraction: .9
+    reserve_fuel: .1
 
 
