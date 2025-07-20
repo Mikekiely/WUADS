@@ -1,0 +1,221 @@
+Mission profile analysis for Aircraft: b737-800
+================================================
+                     Range (nmi)    Fuel Burnt (lbs)
+Total                   2487.81                 0
+
+takeoff                    0.00            358.16
+takeoff                    0.00            149.23
+climb                     14.93           1254.00
+climb                      0.00           3466.18
+climb                    263.78           7647.84
+cruise                  2082.20          24947.87
+descent                   26.90            693.53
+                         100.00           4053.41
+landing                    0.00            669.79
+
+Reserve and Trap Fuel (6.0%): 2760.00 lbs
+
+=========================================================================================
+Segment 0: takeoff
+
+	Range (nmi)                  0.00
+	Wi (lbs)                176528.29
+	Wn (lbs)                176170.13
+	Weight Fraction          0.997971
+	Fuel Burnt (lbs)           358.16
+
+	Lift/Drag                    0.00
+	Cl                         0.0000
+	Cd                         0.0000
+	Cd0                        0.0000
+
+	altitude                     0.00
+	Mach                       0.0000
+	Velocity (ft/s)            0.0000
+	Time (min)                16.0000
+
+	Thrust Required (lbf)      3630.0000
+	Thrust Available (lbf)     48400.0000
+	SFC (lb/lbf/hr)            0.3700
+
+=========================================================================================
+Segment 1: takeoff
+
+	Range (nmi)                  0.00
+	Wi (lbs)                176170.13
+	Wn (lbs)                176020.89
+	Weight Fraction          0.999153
+	Fuel Burnt (lbs)           149.23
+
+	Lift/Drag                    0.00
+	Cl                         0.0000
+	Cd                         0.0000
+	Cd0                        0.0000
+
+	altitude                     0.00
+	Mach                       0.0000
+	Velocity (ft/s)            0.0000
+	Time (min)                 1.0000
+
+	Thrust Required (lbf)     24200.0000
+	Thrust Available (lbf)     48400.0000
+	SFC (lb/lbf/hr)            0.3700
+
+=========================================================================================
+Segment 2: climb
+
+	Range (nmi)                 14.93
+	Wi (lbs)                176020.89
+	Wn (lbs)                174766.90
+	Weight Fraction          0.992876
+	Fuel Burnt (lbs)          1254.00
+
+	Angle of Attack (deg)         5.7674
+	Lift/Drag                   19.24
+	Cl                         0.7270
+	Cd                         0.0378
+	Cd0                        0.0178
+
+	altitude                  5050.00
+	Mach                       0.3837
+	Velocity (ft/s)          421.0000
+	Time (min)                 3.5915
+
+	Thrust Required (lbf)      9177.3928
+	Thrust Available (lbf)     28385.8668
+	SFC (lb/lbf/hr)            0.7333
+
+=========================================================================================
+Segment 3: climb
+
+	Range (nmi)                  0.00
+	Wi (lbs)                174766.90
+	Wn (lbs)                171300.71
+	Weight Fraction          0.980167
+	Fuel Burnt (lbs)          3466.18
+
+	Angle of Attack (deg)         0.4725
+	Lift/Drag                   12.87
+	Cl                         0.2706
+	Cd                         0.0210
+	Cd0                        0.0174
+
+	altitude                 10000.00
+	Mach                       0.6911
+	Velocity (ft/s)          744.8060
+	Time (min)                 0.0000
+
+	Thrust Required (lbf)     13720.3158
+	Thrust Available (lbf)     19428.5658
+	SFC (lb/lbf/hr)            0.8188
+
+=========================================================================================
+Segment 4: climb
+
+	Range (nmi)                263.78
+	Wi (lbs)                171300.71
+	Wn (lbs)                163652.87
+	Weight Fraction          0.955354
+	Fuel Burnt (lbs)          7647.84
+
+	Angle of Attack (deg)         0.9646
+	Lift/Drag                   14.98
+	Cl                         0.3536
+	Cd                         0.0236
+	Cd0                        0.0182
+
+	altitude                 23000.00
+	Mach                       0.7883
+	Velocity (ft/s)          807.5930
+	Time (min)                33.0771
+
+	Thrust Required (lbf)     11782.0053
+	Thrust Available (lbf)     14560.8311
+	SFC (lb/lbf/hr)            0.7589
+
+=========================================================================================
+Segment 5: cruise
+
+	Range (nmi)               2082.20
+	Wi (lbs)                163652.87
+	Wn (lbs)                138705.01
+	Weight Fraction          0.847556
+	Fuel Burnt (lbs)         24947.87
+
+	Angle of Attack (deg)         1.7742
+	Lift/Drag                   17.03
+	Cl                         0.4851
+	Cd                         0.0285
+	Cdw                        0.0000
+	Cd0                        0.0191
+
+	altitude                 35000.00
+	Mach                       0.8500
+	Velocity (ft/s)          826.9591
+	Time (min)               254.9838
+
+	Thrust Required (lbf)      9610.1267
+	Thrust Available (lbf)     10601.0000
+	SFC (lb/lbf/hr)            0.6629
+
+=========================================================================================
+Segment 6: descent
+
+	Range (nmi)                 26.90
+	Wi (lbs)                138705.01
+	Wn (lbs)                138011.48
+	Weight Fraction          0.995000
+	Fuel Burnt (lbs)           693.53
+
+	Lift/Drag                    0.00
+	Cl                         0.0000
+	Cd                         0.0000
+	Cd0                        0.0000
+
+	altitude                 17500.00
+	Mach                       0.0000
+	Velocity (ft/s)          389.1572
+	Time (min)                 0.0019
+
+
+=========================================================================================
+Segment 7: 
+
+	Range (nmi)                100.00
+	Wi (lbs)                138011.48
+	Wn (lbs)                133958.08
+	Weight Fraction          0.970630
+	Fuel Burnt (lbs)          4053.41
+
+	Lift/Drag                    6.49
+	Cl                         3.9468
+	Cd                         0.6083
+	Cd0                        0.0190
+
+	altitude                 20000.00
+	Mach                       0.1929
+	Velocity (ft/s)          200.0000
+	Time (min)                 0.0083
+
+	Thrust Required (lbf)     20647.7038
+	SFC (lb/lbf/hr)            0.3868
+
+=========================================================================================
+Segment 8: landing
+
+	Range (nmi)                  0.00
+	Wi (lbs)                133958.08
+	Wn (lbs)                133288.29
+	Weight Fraction          0.995000
+	Fuel Burnt (lbs)           669.79
+
+	Lift/Drag                    0.00
+	Cl                         0.0000
+	Cd                         0.0000
+	Cd0                        0.0000
+
+	altitude                     0.00
+	Mach                       0.0000
+	Velocity (ft/s)            0.0000
+	Time (min)                 0.0000
+

@@ -1,11 +1,13 @@
-from src.WUADS.mission_profile import takeoff, climb, cruise, descent, landing
+from src.WUADS.mission_segments import takeoff, climb, cruise, descent, landing, loiter, weight_drop
 
 MISSION_KEYS = {
     'takeoff': takeoff,
     'climb': climb,
     'cruise': cruise,
     'descent': descent,
-    'landing': landing
+    'landing': landing,
+    'loiter': loiter,
+    'weight_drop': weight_drop
 }
 
 class Mission:
@@ -21,6 +23,7 @@ class Mission:
     max_mach = 0
     altitude = 0
     design_range = 0
+    range = 0
 
     rho_fuel = 6.8
     ultimate_load = 0
@@ -54,7 +57,6 @@ class Mission:
         else:
             for name, seg in params.items():
                 seg_class = MISSION_KEYS.get(seg['segment_type'])
-                print(seg)
                 self.mission_profile.append(seg_class(aircraft=self.aircraft, title=name, **seg))
 
 
@@ -75,7 +77,7 @@ class Mission:
                 seg_findrange = seg
                 break
             else:
-                seg.breguet_range(aircraft, wi)
+                seg.breguet_range(aircraft, wi=wi)
                 wi *= seg.weight_fraction
 
         if seg_findrange is None:
@@ -87,13 +89,14 @@ class Mission:
                 if seg.find_range:
                     break
                 else:
-                    seg.breguet_range(aircraft, wn)
+                    seg.breguet_range(aircraft, wn=wn)
                     wn = seg.wi
 
-                seg_findrange.set_range(aircraft, wi, wn)
+                seg_findrange.set_range(aircraft, wi=wi, wn=wn)
 
         # Sum total mission range
         max_range = sum(seg.range for seg in mission_profile)
 
         aircraft.range = max_range
         self.mission_profile = mission_profile  # store updated mission profile
+        self.range = max_range

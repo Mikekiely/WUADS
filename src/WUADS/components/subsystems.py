@@ -1,9 +1,9 @@
-import warnings
+import logging
 
 from WUADS.components.component import Component
 from WUADS.components.aerobodies.wing import Wing
 import numpy as np
-
+logger = logging.getLogger(__name__)
 
 # Contains component classes for all various subsystems
 class Subsystems:
@@ -50,7 +50,7 @@ class Subsystems:
                 fun = getattr(self, name)
                 self.weight += fun(aircraft, wdg, comp)
             else:
-                warnings.warn(f'Subsystem {name} does not exist')
+                logging.warning(f'Subsystem {name} does not exist')
 
             # Set inertia value, add to overall inertia
             comp.inertia = [comp.weight * x for x in comp.cg]

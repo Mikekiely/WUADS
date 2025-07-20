@@ -18,7 +18,7 @@ class Vertical(Wing):
         super().__init__(params)
 
         # Set sections for AVL and other class parameters
-        self.sections = [[self.xle, self.yle, self.zle, self.cr, 0],
+        self.avl_sections = [[self.xle, self.yle, self.zle, self.cr, 0],
                          [(self.xle + self.cr / 4) + self.span * np.tan(self.sweep) - self.ct / 4, self.yle, self.zle + self.span, self.ct, 0]]
         xle_tip = self.xle + self.span * np.tan(self.sweep) - .25 * self.ct
         self.sweep_le = np.arctan((xle_tip - self.xle) / self.span)

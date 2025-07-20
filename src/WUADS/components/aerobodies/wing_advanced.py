@@ -1,14 +1,13 @@
 from WUADS.components.aerobodies.wing import Wing
-import warnings
 import numpy as np
 
 class Wing_advanced(Wing):
     input_params = {}
     definition_type = "Sections"
-    _avl_sections = []
+    avl_sections = []
     twist = []
     airfoil = []
-    component_type = 'wing_advanced'
+    component_type = 'Wing_Advanced'
     sections = []
 
     def __init__(self, params):

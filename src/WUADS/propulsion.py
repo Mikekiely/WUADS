@@ -1,10 +1,10 @@
-import warnings
+import logging
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment
 from WUADS.flight_conditions import FlightConditions
 import numpy as np
-
+logger = logging.getLogger(__name__)
 
 class engine:
     """
@@ -159,7 +159,8 @@ class turbofan(engine):
                           sfc_sea_level=None, thrust_cruise=None, sfc_cruise=None):
 
         if h_cruise > self.altitude_ref[-1]:
-            warnings.warn(
+            # TODO make this work outside bounds
+            logging.warning(
                 f'Input cruise altitude is higher than the standard engine bounds ({self.altitude_ref[-1]} ft), could not scale engine data. Please select a different engine or lower the cruise altitude',
                 UserWarning)
             return

@@ -1,0 +1,16 @@
+[project]
+name = "wuads"
+version = "0.1.0"
+description = "Aircraft design suite with GUI"
+dependencies = [
+    "PySide6"
+]
+
+[project.scripts]
+wuads-gui = "wuads.gui.main:launch_gui"
+
+[tool.setuptools.packages.find]
+include = ["wuads*"]
+
+[tool.setuptools.package-data]
+"wuads.assets" = ["*.yml"]

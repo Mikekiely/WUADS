@@ -84,6 +84,10 @@ class Engine(PhysicalComponent):
         self.set_cg()
         return self.weight
 
+    def set_cg(self):
+        self.cg = [self.xle + self.length/2, self.yle, self.zle]
+        self.inertia = [x * self.weight for x in self.cg]
+
     def raymer_weight(self, aircraft, wdg):
         """
         Calculates nacelle weight using Raymer method

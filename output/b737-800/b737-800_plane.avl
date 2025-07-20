@@ -1,0 +1,83 @@
+AVL Geometry
+
+#Mach
+0.8
+
+#IYsym   IZsym   Zsym
+0       0       0
+#Sref    Cref    Bref
+1340   14.19868995055049   111
+
+#Xref    Yref    Zref
+72     3.171004461074903     -0.40953442735193585
+#--------------------------------------------------
+SURFACE
+Main Wing
+
+!Nchordwise  Cspace  Nspanwise  Sspace
+12           2.0     26         -1.5
+Component
+1
+
+Angle
+2 
+
+YDUPLICATE
+0
+
+SCALE
+1   1   1
+
+Section
+#Xle    Yle    Zle     Chord   Ainc  Nspanwise  Sspace
+51.3  0  -2.42  20.848065058409592  0
+
+Section
+#Xle    Yle    Zle     Chord   Ainc  Nspanwise  Sspace
+81.5798653349029  55.5  3.4132850572450444  3.296079085734556  0
+
+#--------------------------------------------------
+SURFACE
+Horizontal Stabilizer
+
+!Nchordwise  Cspace  Nspanwise  Sspace
+12           2.0     26         -1.5
+YDUPLICATE
+0
+
+SCALE
+1   1   1
+
+Section
+#Xle    Yle    Zle     Chord   Ainc  Nspanwise  Sspace
+111.5  0  4.415  12.8  0
+Control
+Elevator 1.0 0.2 0. 1. 0. 1
+
+Section
+#Xle    Yle    Zle     Chord   Ainc  Nspanwise  Sspace
+130.08901391942172  23.4  7.288158725127968  2.55  0
+Control
+Elevator 1.0 0.2 0. 1. 0. 1
+
+#--------------------------------------------------
+SURFACE
+Vertical Stabilizer
+
+!Nchordwise  Cspace  Nspanwise  Sspace
+12           2.0     26         -1.5
+YDUPLICATE
+0
+
+SCALE
+1   1   1
+
+Section
+#Xle    Yle    Zle     Chord   Ainc  Nspanwise  Sspace
+105  0  6.66  21.21  0
+
+Section
+#Xle    Yle    Zle     Chord   Ainc  Nspanwise  Sspace
+130.80745535528587  0  32.81  5.75  0
+
+#--------------------------------------------------

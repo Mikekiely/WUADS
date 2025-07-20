@@ -1,5 +1,4 @@
-import warnings
-
+import logging
 from WUADS.components.component import PhysicalComponent
 import numpy as np
 
@@ -40,6 +39,7 @@ class Wing(PhysicalComponent):
     laminar_percent = .05
     winglet = {}
     xc = .35    # x value at mean camber line
+    avl_sections = []
 
     def __init__(self, params):
         """
@@ -65,7 +65,7 @@ class Wing(PhysicalComponent):
             self.area = area
             self.taper = ct / cr
         else:
-            warnings.warn(" Wing is not well defined")
+            logging.warning(" Wing is not well defined")
 
         # Calculate class variables
         b = self.span / 2
@@ -81,19 +81,19 @@ class Wing(PhysicalComponent):
         self.dihedral = np.deg2rad(self.dihedral)
 
         # Create sections used for AVL Analysis
-        self._avl_sections = [[xle, yle, zle, self.cr, 0],
-                              [(xle + cr / 4) + b * np.tan(self.sweep) - self.ct / 4, b + yle, zle + b * \
+        self.avl_sections = [[xle, yle, zle, self.cr, 0],
+                             [(xle + cr / 4) + b * np.tan(self.sweep) - self.ct / 4, b + yle, zle + b * \
                           np.tan(self.dihedral), ct, 0]]
 
         # Add winglet if exists
         winglet = params.get('winglet', None)
         if winglet is not None:
-            section1 = self._avl_sections[1]
+            section1 = self.avl_sections[1]
             sweep = winglet['sweep']
             height = winglet['height']
             dihedral = winglet['dihedral']
             ct_wl = winglet['ct']
-            self._avl_sections.append([section1[0] + np.tan(sweep) * height, section1[1] + height / np.tan(dihedral), section1[2] + height, ct_wl, 0])
+            self.avl_sections.append([section1[0] + np.tan(sweep) * height, section1[1] + height / np.tan(dihedral), section1[2] + height, ct_wl, 0])
 
         # Set wetted surface area (Torenbeek - advanced aircraft design)
         kq = 0.95

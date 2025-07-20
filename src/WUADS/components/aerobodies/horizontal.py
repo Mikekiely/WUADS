@@ -8,6 +8,8 @@ class Horizontal(Wing):
     Subclass of wing, has all the same variables.
     """
     weight_averages = [.2, .4, .4]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
+    control_surface_ratio = .2
+
     def __init__(self, params):
         """
         Initializes horizontal stabilizer component

@@ -1,18 +1,18 @@
 import yaml
 import importlib
+import sys
 from src.WUADS.components.component import Component
 from WUADS.components.subsystems import Subsystems
 from WUADS.mission import Mission
 from WUADS.components.usefulload import UsefulLoad
 from WUADS.propulsion import turbofan, propeller
-from WUADS.mission_profile import *
+from WUADS.mission_segments import *
 from WUADS.flight_conditions import FlightConditions
 from WUADS.components.aerobodies.wing import Wing
 from WUADS.components.aerobodies.fuselage import Fuselage
 from WUADS.components.aerobodies.horizontal import Horizontal
 from WUADS.components.aerobodies.vertical import Vertical
 from WUADS.components.aerobodies.engine import Engine
-import warnings
 
 AEROBODY_CLASSES = {
     "wing": Wing,
@@ -21,6 +21,15 @@ AEROBODY_CLASSES = {
     "vertical": Vertical,
     "engine": Engine
 }
+
+import logging
+
+# Set up basic config: terminal output only
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 class Aircraft:
     """
@@ -68,7 +77,7 @@ class Aircraft:
     propulsion = None
     aircraft_type = 'transport'
 
-    output_dir = None
+    _output_dir = None
     _file_prefix = None
 
     def __init__(self, config_file, wdg_guess=100000):
@@ -84,7 +93,10 @@ class Aircraft:
         self.load_config()
         self.set_weight(wdg_guess=wdg_guess)
         self.set_cd0()
-        self.output_dir = os.path.join(os.getcwd(), "output")
+        self.file_prefix = self.title
+        if not self._output_dir:
+            self.output_dir = os.path.join(os.getcwd(), f'./output/{self.file_prefix}')
+
 
     def load_config(self):
         """
@@ -120,7 +132,7 @@ class Aircraft:
                 try:
                     self.aero_components[params['title']] = component_class(params)
                 except TypeError:
-                    warnings.warn(f'Component type {component_type} not found, the valid component types are as follows: {AEROBODY_CLASSES.keys()}')
+                    logger.warning(f'Component type {component_type} not found, the valid component types are as follows: {AEROBODY_CLASSES.keys()}')
 
             # Set subsystem parameters for weight estimation
             subsystem_parameters = {}
@@ -158,7 +170,7 @@ class Aircraft:
         :param sfc_cruise:  Specific fuel consumption at cruise
         """
         if not 'engine_type' in kwargs:
-            warnings.warn('Engine Type is not declared in propulsion parameters, defaulting to turbofan')
+            logger.warn('Engine Type is not declared in propulsion parameters, defaulting to turbofan')
             engine_type = 'turbofan'
         else:
             engine_type = kwargs['engine_type']
@@ -183,9 +195,9 @@ class Aircraft:
             horse_power = kwargs.get('horse_power', None)
             fuel_consumption_rate = kwargs.get('fuel_consumption_rate', None)
             if not horse_power:
-                warnings.warn('Please enter a base horsepower for propeller engine')
+                logger.warning('Please enter a base horsepower for propeller engine')
             if not fuel_consumption_rate:
-                warnings.warn('Please enter a fuel consumption rate for propeller engine')
+                logger.warning('Please enter a fuel consumption rate for propeller engine')
             engine = propeller(
                 n_engines=n_engines,
                 horse_power=horse_power,
@@ -515,6 +527,23 @@ class Aircraft:
             self.mission.ultimate_load = nz
 
     @property
+    def output_dir(self):
+        return self._output_dir
+
+    @output_dir.setter
+    def output_dir(self, directory: str):
+        # Convert to absolute path (handles both absolute and relative)
+        output_dire = os.path.abspath(directory.strip())
+
+        # Create directory if it doesn't exist
+        if not os.path.isdir(output_dire):
+            try:
+                os.makedirs(output_dire)
+            except Exception as e:
+                raise ValueError(f"Could not create directory: {e}")
+        self._output_dir = output_dire
+
+    @property
     def file_prefix(self):
         return self._file_prefix
 
@@ -523,7 +552,8 @@ class Aircraft:
         # check if there's invalid characters in the file prefix
         invalid_chars = r'<>:"/\\|?*'
         if any(char in prefix for char in invalid_chars):
-            warnings.warn('file name contains invalid characters')
+            logger.error('file name contains invalid characters')
+            sys.exit(1)
             return False
 
         # Reserved Windows filenames
@@ -534,11 +564,13 @@ class Aircraft:
         }
         name_upper = os.path.splitext(prefix)[0].upper()
         if name_upper in reserved_names:
-            warnings.warn('file name is reserved')
+            logger.error('file name is invalid')
+            sys.exit(1)
             return False
 
         # Don't allow path separators
         if os.sep in prefix or (os.altsep and os.altsep in prefix):
-            warnings.warn('file name is invalid, please do not use "/"')
+            logger.error('file name is invalid, please do not use "/"')
+            sys.exit(1)
             return False
         self._file_prefix = prefix

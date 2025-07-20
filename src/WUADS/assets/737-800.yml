@@ -46,6 +46,7 @@ components:
     xle: 111.5
     yle: 0
     zle: 4.415
+    control_surface_ratio: .2
 
   vertical:
     title: 'Vertical Stabilizer'
@@ -84,6 +85,7 @@ components:
     yle: 15.75
     zle: -5
     attachment: 'Main Wing'    # What component is this attached to - make sure it is the title of a component declared earlier
+    w_engine: 5216
 
     # Optional Inputs
     pylon_mounted: True # Is the nacelle mounted on a pylon or not (Optional)
@@ -119,29 +121,32 @@ subsystem_parameters:
 mission_profile:
   takeoff_1:
     segment_type: takeoff
-    thrust_setting: 75
-    time: 30
+    thrust_setting: .15
+    time: 16              # Minutes
   takeoff_2:
     segment_type: takeoff
-    thrust_setting: 75
-    time: 30
+    thrust_setting: 1
+    time: 1               # Minutes
   climb_1:
+    run_sim: True
     segment_type: climb
-    start_velocity: 150
-    end_velocity: 200
-    start_altitude: 0
+    start_velocity: 421
+    end_velocity: 421
+    start_altitude: 100
     end_altitude: 10000
   climb_2:
+    run_sim: True
     segment_type: climb
-    start_velocity: 200
-    end_velocity: 500
+    start_velocity: 421
+    end_velocity: 879
     start_altitude: 10000
-    end_altitude: 22000
+    end_altitude: 10000
   climb_3:
+    run_sim: True
     segment_type: climb
-    start_velocity: 500
-    end_velocity: 550
-    start_altitude: 22000
+    start_velocity: 879
+    end_velocity: 778
+    start_altitude: 10000
     end_altitude: 36000
   cruise:
     segment_type: cruise
@@ -150,10 +155,15 @@ mission_profile:
     find_range: True
   descent:
     segment_type: descent
-    weight_fraction: .95
+    weight_fraction: .995
+  loiter:
+    segment_type: loiter
+    altitude: 1500
+    time: .5
+    mach: .25
   landing:
-    segment_type: descent
-    weight_fraction: .9
-    reserve_fuel: .1
+    segment_type: landing
+    weight_fraction: .995
+    reserve_fuel: .06
 
 

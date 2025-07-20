@@ -1,6 +1,7 @@
-import warnings
+import logging
 import numpy as np
 
+logger = logging.getLogger(__name__)
 
 class Component:
     """
@@ -51,7 +52,7 @@ class Component:
         if hasattr(self, variable):
             setattr(self, variable, value)
         else:
-            warnings.warn(f'Variable {variable} not found found in list of variables for component {self.__class__}')
+            logging.warning(f'Variable {variable} not found found in list of variables for component {self.__class__}')
         if hasattr(self.params, variable):
             setattr(self.params, variable, value)
 
@@ -78,7 +79,7 @@ class PhysicalComponent(Component):
     Component which effects aerodynamic performance of the aircraft
     """
     # Default Values
-    _avl_sections = []  # Sections to input into AVL
+    avl_sections = []  # Sections to input into AVL
     attachment = ""  # What component is this attached to, eg. nacelle attached to wing
     cd0 = 0.0  # Parasite drag coefficient
     cdw = 0.0  # Wave drag coefficient
