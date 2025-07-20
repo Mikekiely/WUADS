@@ -42,7 +42,6 @@ class propulsion_input(QWidget):
 
         form = self.form_layout
         self.input_fields = {}
-        print(engine_type)
         if engine_type.lower() == 'turbofan':
             # Add file save
             self.file_input = QLineEdit(self.prop.engine_data_file)
@@ -84,7 +83,6 @@ class propulsion_input(QWidget):
 
     def handle_data_file_changed(self):
         data_file = self.file_input.text()
-        print(data_file)
         if os.path.exists(data_file):
             self.file_input.setStyleSheet("")
             self.prop.load_data_file(data_file)
@@ -108,8 +106,6 @@ class propulsion_input(QWidget):
         n_stations_new = math.ceil(n_engines/2)
         if n_stations_old != n_stations_new:
             self.n_engines_changed.emit(n_engines)
-
-        print(f'olds: {n_stations_old}, new: {n_stations_new}')
 
     def reset_engine(self):
         for item in self.input_fields.values():

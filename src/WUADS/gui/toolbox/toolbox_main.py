@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QWidget,
     QMenu,
     QMessageBox,
-    QPushButton, QInputDialog
+    QPushButton, QInputDialog, QDialog
 )
 from WUADS.gui.toolbox.aircraft_info import aircraft_info
 from WUADS.gui.toolbox.component_edit import component_edit
@@ -153,7 +153,13 @@ class ToolBox(QToolBox):
         """Opens a pop-up dialog to edit the selected mission profile segment."""
         phase = item.text()
         popup = mission_profile_edit(self, phase)
-        popup.exec()
+        if popup.exec() == QDialog.Accepted:
+            self.refresh_mission_profile_list()
+
+    def refresh_mission_profile_list(self):
+        self.mission_profile_list.clear()
+        for seg in self.aircraft.mission.mission_profile:
+            self.mission_profile_list.addItem(seg.title)
 
     def handleUsefulLoadClicked(self, item):
         popup = useful_load_edit(self, useful_load_types[item.text()])
@@ -193,7 +199,6 @@ class ToolBox(QToolBox):
 
     def contextMenuEvent(self, event):
         index = self.currentIndex()
-        print("Current Index:", index)
         # Component List
         if index == 1:
             # Add component and Remove Component Options
@@ -228,10 +233,12 @@ class ToolBox(QToolBox):
             add_segment = context_menu.addMenu("Add Mission Profile Segment")
             for seg in mission_profile_types.keys():
                 add_segment.addAction(seg)
+            add_segment.triggered.connect(self.handleAddMissionProfileSegment)
             remove_segment = context_menu.addMenu("Remove Selected Segment")
-            # for seg in self.aircraft.mission.mission_profile:
-
-
+            for seg in self.aircraft.mission.mission_profile:
+                remove_segment.addAction(seg.title)
+            remove_segment.triggered.connect(self.handleRemoveMissionProfileSegment)
+            context_menu.exec(event.globalPos())
 
     def handleAddComponent(self, item):
         component = item.text().lower()
@@ -273,11 +280,16 @@ class ToolBox(QToolBox):
         pop.title_changed.connect(self.handle_title_changed)
         pop.exec()
 
-    def handleAddMissionProfileSegment(self):
-        text, ok = QInputDialog.getText(self, "Add Mission Profile Segment", "Enter segment name:")
-        if ok and text:
-            self.mission_profile_list.addItem(text)
-            mission_profile_types[text] = {}  # Initialize with empty dictionary
+    def handleAddMissionProfileSegment(self, item):
+        segment_type = item.text().lower()
+
+        popup = mission_profile_edit(self, segment_type.capitalize())
+        if popup.exec() == QDialog.Accepted:
+            self.refresh_mission_profile_list()
+
+        # if ok and text:
+        #     self.mission_profile_list.addItem(text)
+        #     mission_profile_types[text] = {}  # Initialize with empty dictionary
 
     def handleRemoveMissionProfileSegment(self):
         selected_item = self.mission_profile_list.currentItem()

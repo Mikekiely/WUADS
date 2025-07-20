@@ -1,6 +1,8 @@
-import yaml
 import importlib
 import sys
+# from ruamel.yaml import YAML
+import yaml
+
 from src.WUADS.components.component import Component
 from WUADS.components.subsystems import Subsystems
 from WUADS.mission import Mission
@@ -105,6 +107,8 @@ class Aircraft:
 
         self.mission = Mission(self)
         with open(self.input_file) as f:
+            # yml = YAML(typ='safe', pure=True)
+            # config = yml.load(f)
             config = yaml.safe_load(f)
 
             # Set all aircraft variables
@@ -360,6 +364,10 @@ class Aircraft:
 
     def write_config_file(self, file_name=None):
         """ Write a .yaml file to save the aircraft's variables """
+
+        if not file_name:
+            file_name = os.path.join(self.output_dir, "aircraft.yaml")
+
         component_list = {}
         for comp in self.aero_components.values():
             params = {}
@@ -394,6 +402,13 @@ class Aircraft:
                              'sfc_sea_level': self.propulsion.sfc_sea_level,
                              'sfc_cruise': self.propulsion.sfc_cruise}
 
+        mission_profile_params = {}
+        for seg in self.mission.mission_profile:
+            seg_params = {}
+            for item in seg.input_params:
+                seg_params[item] = getattr(seg, item)
+            mission_profile_params[seg.title] = seg_params
+
         data = {
             'aircraft': {
                 'title': self.title,
@@ -417,6 +432,7 @@ class Aircraft:
             'components': component_list,
             'subsystem_parameters': subsystem_params,
             'propulsion': propulsion_params,
+            'mission_profile': mission_profile_params
 
         }
 
@@ -424,7 +440,9 @@ class Aircraft:
             file_name = self.input_file
 
         with open(file_name, 'w') as file:
-            yaml.dump(data, file, default_flow_style=False)
+            # yaml = YAML(typ='unsafe', pure=True)
+            # yaml.default_flow_style = False
+            yaml.dump(data, file, default_flow_style=False, sort_keys=False)
 
     def add_misc_weight(self, title, weight, cg=None):
         """

@@ -340,10 +340,6 @@ class propeller(engine):
             thrust = max_thrust
             sfc = fuel_mass_flow_rate_lb_per_hr / thrust  # lb/(lbf*hr)
 
-        print("efficiency", nu_propeller)
-        print("sfc", sfc)
-        print("max thrust", max_thrust)
-
         self.max_thrust = max_thrust
         return sfc, max_thrust
 
@@ -351,7 +347,6 @@ class propeller(engine):
     @staticmethod
     def prop_efficiency(mach):
         nu_max = 0.85  # can adjust
-        print('mach', mach)
         if mach == 0:
             nu_propeller = .8  # default? not sure what happens at 0 velocity
         elif 0 < mach <= 0.1:
@@ -363,6 +358,5 @@ class propeller(engine):
         else:
             nu_propeller = max(0.0, 10 * mach * nu_max * (
                         1 - (mach - 0.7) / 3))  # prevent negative (just sets to 0 if negative)
-            print('negative')
 
         return nu_propeller

@@ -34,7 +34,7 @@ class MissionSegment:
 
     power_required = 0
     power_required_kw = 0
-
+    input_params = []
 
 
     def __init__(self):
@@ -46,6 +46,7 @@ class MissionSegment:
 
 class takeoff(MissionSegment):
     thrust_setting = 100
+    input_params = ['thrust_setting', 'time', 'title']
 
     def __init__(self, thrust_setting=100, time=0, title='takeoff', **kwargs):
         self.title = title
@@ -81,12 +82,12 @@ class climb(MissionSegment):
     rate_of_climb = 0
     max_thrust = 0
     K = 0
+    input_params = ['start_velocity', 'end_velocity', 'start_altitude', 'end_altitude', 'title']
 
-    def __init__(self, title='climb', start_velocity=0, end_velocity=0, start_altitude=0, end_altitude=0, best_climb=False, **kwargs):
+    def __init__(self, title='climb', start_velocity=0, end_velocity=0, start_altitude=0, end_altitude=0, **kwargs):
         super().__init__()
         self.title = title
         self.__dict__.update(kwargs)
-        self.best_climb = best_climb
         self.start_velocity = start_velocity
         self.end_velocity = end_velocity
         self.start_altitude = start_altitude
@@ -165,25 +166,29 @@ class climb(MissionSegment):
 class cruise(MissionSegment):
     wn = 0
     range = None
+    input_params = ['mach', 'altitude', 'title', 'find_range', 'range']
 
-    def __init__(self, aircraft=None, mach=0, altitude=0, title='cruise', find_range=True, range=None, **kwargs):
+    def __init__(self, mach=0, altitude=0, title='cruise', find_range=True, range=None, **kwargs):
         self.title = title
         super().__init__()
         self.mach = mach
         self.altitude = altitude
-        self.flight_conditions = aircraft.cruise_conditions
         self.find_range = find_range
-
-        self.range = range
+        if find_range:
+            self.range = range
+            self.input_params.remove('range')
         self.run_sim = True
         fc = FlightConditions(self.altitude, self.mach)
         self.flight_conditions = fc
         self.velocity = fc.velocity
         self.segment_type = 'cruise'
-        self.cd0, self.cdw = aircraft.get_cd0(self.altitude, self.mach)
 
     def breguet_range(self, aircraft, wn=None, wi=None):
         # determines the fuel burnt during a set range cruise segment
+
+        self.flight_conditions = aircraft.cruise_conditions
+
+        self.cd0, self.cdw = aircraft.get_cd0(self.altitude, self.mach)
         if self.range is None:
             print('Please input a desired range or set find_range to true')
             return
@@ -246,6 +251,7 @@ class cruise(MissionSegment):
 
 
 class descent(MissionSegment):
+    input_params = ['title', 'weight_fraction']
     def __init__(self, title='descent', weight_fraction=1, **kwargs):
         self.title = title
         super().__init__()
@@ -272,7 +278,7 @@ class descent(MissionSegment):
 
 
 class loiter(MissionSegment):
-
+    input_params = ['title', 'altitude', 'time', 'mach']
     def __init__(self, title='loiter', altitude=0, time=0, mach=None, **kwargs):
         """
         Initiate a loiter segment
@@ -283,6 +289,7 @@ class loiter(MissionSegment):
         super().__init__()
         self.altitude = altitude
         self.time = time
+        self.segment_type = 'loiter'
         if not mach:
             self.mach = .25
 
@@ -335,6 +342,7 @@ class landing(MissionSegment):
     reserve_fuel = 0
     wf_reserve = 0
     w_landing = 0
+    input_params = ['title', 'weight_fraction', 'reserve_fuel']
 
     def __init__(self, title='landing', weight_fraction=1, reserve_fuel=0, **kwargs):
         self.title = title
@@ -362,6 +370,7 @@ class landing(MissionSegment):
 class weight_drop(MissionSegment):
     # Instantaneous weight drop
     weight_dropped = 0
+    input_params = ['title', 'weight_dropped']
 
     def __init__(self, title='weight_drop', weight_dropped=0, **kwargs):
         self.title = title

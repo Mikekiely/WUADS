@@ -89,7 +89,6 @@ class component_edit(QDialog):
                 else:
                     val = getattr(aircraft.aero_components[component], item.lower())
                     if item == 'Sweep' or item.startswith('Dihedral'):
-                        print(item)
                         val *= 180 / 3.14159
                         val = round(val, 2)
             except KeyError:

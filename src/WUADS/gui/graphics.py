@@ -262,7 +262,6 @@ def plot_component(component):
 
         stl_path = resources.files("WUADS.assets").joinpath("nacelle.stl")
         for x, y, z in zip(xle, yle, zle):
-            print('file found')
             # Read STL from package resource path
             temp = pv.read(str(stl_path)).rotate_y(-90, inplace=True)
             bounds = temp.bounds
