@@ -57,4 +57,23 @@ heavier wing since more structural support is required. When you check off this 
 constant where they currently are. This is also important when running off design conditions, like a mission with less than 
 maximum fuel or cargo weight.
 
+---
+Component List
+---
+This is where you edit you major structural components like the wing and the fuselage. You can double click to edit
+and existing component or you can right click to add or remove a component. Note that as the code stands right now,
+you are required to have components named 'Fuselage', 'Main Wing', and 'Engine'. There are plans to update this in the 
+future, but as of now do not delete these components.
+
+---
+Useful Load
+---
+Here, you can edit all the non structural weights that your plane is holding, like the passengers, pilots, cargo, fuel,
+and crew. When you double-click on one, additionally you can edit the x coordinate of the center of gravity.
+The reset button on the bottom resets the center of gravity to reasonable positions (note: this is based on the 737. 
+don't use this feature on configurations significantly different that this.)
+
+---
+
+
 
