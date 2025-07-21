@@ -16,11 +16,12 @@ dependencies = [
     "numpy",
     "scipy",
     "pyyaml",
-    "pandas"
+    "pandas",
+    "openpyxl"
 ]
 
 [project.scripts]
-wuads-gui = "WUADS.gui.main:launch_gui"  # Make sure this function exists
+wuads-gui = "WUADS.gui.main:main"  # Make sure this function exists
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,6 +1,9 @@
 # TODO Fuel CG
-from PySide6.QtWidgets import QWidget, QFormLayout, QLineEdit, QLabel, QCheckBox
-
+from PySide6.QtWidgets import QWidget, QFormLayout, QLineEdit, QLabel, QCheckBox, QComboBox
+AIRCRAFT_TYPES = {
+    'Transport': 'transport',
+    'General Aviation': 'general_aviation'
+}
 
 class aircraft_info(QWidget):
     """
@@ -51,6 +54,7 @@ class aircraft_info(QWidget):
                 val = str(getattr(self.aircraft.mission, self.variable_names[item]))
             else:
                 val = ''
+
             line_edit.textChanged.connect(lambda text, var=item: self.text_changed(var, text))
             line_edit.setText(val)
             self.input_fields[item] = line_edit
@@ -58,12 +62,23 @@ class aircraft_info(QWidget):
             label.setToolTip(self.tool_tips[item])
             form.addRow(label, line_edit)
 
+        # Aircraft type select
+        self.aircraft_type_select = QComboBox()
+        self.aircraft_type_select.addItems(['Transport', 'General Aviation'])
+        if self.aircraft.aircraft_type == 'general_aviation':
+            self.aircraft_type_select.setCurrentIndex(1)
+        self.aircraft_type_select.currentTextChanged.connect(self.aircraft_type_changed)
+        form.addRow(QLabel('Aircraft Type'), self.aircraft_type_select)
+
         # Add lock component weights Checkbox
         self.checkbox = QCheckBox('Lock Component Weights')
         self.checkbox.setChecked(False)
         self.checkbox.stateChanged.connect(self.checkbox_toggled)
         form.addRow(self.checkbox)
         # self.checkbox = QCheckBox()
+
+    def aircraft_type_changed(self, type):
+        self.aircraft.aircraft_type = AIRCRAFT_TYPES[type]
 
     def checkbox_toggled(self, state):
         self.aircraft.lock_component_weights = state == 2

@@ -5,8 +5,8 @@ import argparse
 from pathlib import Path
 from importlib import resources
 from PySide6.QtWidgets import QApplication
-from .gui.main_window import MainWindow
-from .aircraft import Aircraft  # Handles loading config internally
+from .main_window import MainWindow
+from ..aircraft import Aircraft  # Handles loading config internally
 
 def main():
     parser = argparse.ArgumentParser()

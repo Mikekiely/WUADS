@@ -253,7 +253,6 @@ def plot_component(component):
         xle = component.xle
         yle = component.yle
         zle = component.zle
-        print(xle)
         if not isinstance(xle, list):
             xle = [component.xle]
             yle = [component.yle]
