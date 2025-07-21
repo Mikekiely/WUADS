@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QLineEdit, QDialog, QFormLayout, QLabel, QCheckBox, QComboBox, QDialogButtonBox
 from PySide6.QtCore import Signal
-from WUADS.mission_segments import *
+from ...mission_segments import *
 
 #TODO: make sure these types actually line up
 mission_profile_types = {'Takeoff': 'takeoff',

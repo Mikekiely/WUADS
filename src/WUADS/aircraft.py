@@ -3,18 +3,18 @@ import sys
 # from ruamel.yaml import YAML
 import yaml
 
-from src.WUADS.components.component import Component
-from WUADS.components.subsystems import Subsystems
-from WUADS.mission import Mission
-from WUADS.components.usefulload import UsefulLoad
-from WUADS.propulsion import turbofan, propeller
-from WUADS.mission_segments import *
-from WUADS.flight_conditions import FlightConditions
-from WUADS.components.aerobodies.wing import Wing
-from WUADS.components.aerobodies.fuselage import Fuselage
-from WUADS.components.aerobodies.horizontal import Horizontal
-from WUADS.components.aerobodies.vertical import Vertical
-from WUADS.components.aerobodies.engine import Engine
+from .components.component import Component
+from .components.subsystems import Subsystems
+from .mission import Mission
+from .components.usefulload import UsefulLoad
+from .propulsion import turbofan, propeller
+from .mission_segments import *
+from .flight_conditions import FlightConditions
+from .components.aerobodies.wing import Wing
+from .components.aerobodies.fuselage import Fuselage
+from .components.aerobodies.horizontal import Horizontal
+from .components.aerobodies.vertical import Vertical
+from .components.aerobodies.engine import Engine
 
 AEROBODY_CLASSES = {
     "wing": Wing,

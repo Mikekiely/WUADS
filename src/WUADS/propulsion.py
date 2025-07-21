@@ -2,7 +2,7 @@ import logging
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment
-from WUADS.flight_conditions import FlightConditions
+from .flight_conditions import FlightConditions
 import numpy as np
 logger = logging.getLogger(__name__)
 

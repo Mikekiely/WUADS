@@ -1,16 +1,32 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "wuads"
+name = "WUADS"
 version = "0.1.0"
-description = "Aircraft design suite with GUI"
+description = "Conceptual aircraft design package with empirical and numerical methods"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
 dependencies = [
-    "PySide6"
+    "pyside6",
+    "pyvista",
+    "pyvistaqt",
+    "numpy",
+    "scipy",
+    "pyyaml",
+    "pandas"
 ]
 
 [project.scripts]
-wuads-gui = "wuads.gui.main:launch_gui"
+wuads-gui = "WUADS.gui.main:launch_gui"  # Make sure this function exists
 
 [tool.setuptools.packages.find]
-include = ["wuads*"]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
 
 [tool.setuptools.package-data]
-"wuads.assets" = ["*.yml"]
+WUADS = ["assets/**/*"]  # includes all nested files in assets

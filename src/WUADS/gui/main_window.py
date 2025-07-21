@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QMainWindow, QHBoxLayout, QFileDialog
-from WUADS.gui.toolbox.toolbox_main import ToolBox
-from WUADS.aircraft import Aircraft
-from WUADS.gui.graphics import graphics
+from .toolbox.toolbox_main import ToolBox
+from ..aircraft import Aircraft
+from .graphics import graphics
 
 # git is working
 
