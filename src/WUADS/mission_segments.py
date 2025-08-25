@@ -4,6 +4,7 @@ import subprocess
 from WUADS.flight_conditions import FlightConditions
 from WUADS.avl_run import run_AVL, AVL_input, import_coefficients
 import numpy as np
+import sys
 
 class MissionSegment:
     """
@@ -177,6 +178,8 @@ class cruise(MissionSegment):
         if find_range:
             self.range = range
             self.input_params.remove('range')
+        else:
+            self.range = range
         self.run_sim = True
         fc = FlightConditions(self.altitude, self.mach)
         self.flight_conditions = fc
@@ -190,8 +193,8 @@ class cruise(MissionSegment):
 
         self.cd0, self.cdw = aircraft.get_cd0(self.altitude, self.mach)
         if self.range is None:
-            print('Please input a desired range or set find_range to true')
-            return
+            sys.exit('Please input a desired range or set find_range to true')
+            logger.error('Please input a desired range or set find_range to true')
 
         if wi:
             self.wi = wi
@@ -309,8 +312,8 @@ class loiter(MissionSegment):
         cd0, _ = aircraft.get_cd0(self.altitude, self.mach)
         self.cd0 = cd0
         self.flight_conditions = FlightConditions(self.altitude, self.mach)
+        #TODO fix this, add an actual K calculator
         self.velocity = np.sqrt(2 * wn / (self.flight_conditions.rho * aircraft.sref) * np.sqrt(K / (3 * cd0)))
-        self.velocity = 200
         self.mach = self.velocity / self.flight_conditions.a
         self.flight_conditions = FlightConditions(self.altitude, self.mach)
         E = self.time * 3600

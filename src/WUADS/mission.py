@@ -1,4 +1,7 @@
 from src.WUADS.mission_segments import takeoff, climb, cruise, descent, landing, loiter, weight_drop
+import logging
+
+logger = logging.getLogger(__name__)
 
 MISSION_KEYS = {
     'takeoff': takeoff,
@@ -60,7 +63,7 @@ class Mission:
                 self.mission_profile.append(seg_class(aircraft=self.aircraft, title=name, **seg))
 
 
-    def run_case(self):
+    def run_case(self, mute_output=False):
         """
         Runs mission profile calculations using the user-defined mission profile.
         Assumes self.mission_profile is already populated with valid mission segments.
@@ -68,6 +71,9 @@ class Mission:
         aircraft = self.aircraft
         mission_profile = self.mission_profile  # use the existing mission profile defined by user
         wi = aircraft.weight_takeoff
+
+        if not mute_output:
+            logger.info("Generating mission profile...")
 
         # Forward loop: compute weight fractions and range up to the find_range segment
         seg_findrange = None
@@ -77,6 +83,7 @@ class Mission:
                 seg_findrange = seg
                 break
             else:
+                logger.info(f"Analyzing conditions for mission segment {seg.title}")
                 seg.breguet_range(aircraft, wi=wi)
                 wi *= seg.weight_fraction
 
@@ -89,14 +96,16 @@ class Mission:
                 if seg.find_range:
                     break
                 else:
+                    logger.info(f"Analyzing conditions for mission segment {seg.title}")
                     seg.breguet_range(aircraft, wn=wn)
                     wn = seg.wi
 
-                seg_findrange.set_range(aircraft, wi=wi, wn=wn)
+            logger.info(f"Finding maximum range")
+            seg_findrange.set_range(aircraft, wi=wi, wn=wn)
 
         # Sum total mission range
         max_range = sum(seg.range for seg in mission_profile)
-
+        logger.info(f"Analysis complete, maximum range is {max_range}")
         aircraft.range = max_range
         self.mission_profile = mission_profile  # store updated mission profile
         self.range = max_range
