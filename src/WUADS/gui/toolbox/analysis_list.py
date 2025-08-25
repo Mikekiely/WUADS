@@ -57,7 +57,7 @@ class analysis_list(QListWidget):
         file_dialog = QFileDialog(self)
         file_dialog.exec()
         filename = file_dialog.selectedFiles()[0]
-        aircraft.run_case()
+        aircraft.mission.run_case()
         mission_profile_report(aircraft, filename=filename)
 
         with open(filename, 'r') as file:
