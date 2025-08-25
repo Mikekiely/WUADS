@@ -163,3 +163,67 @@ class component_edit(QDialog):
 
         # value = [line.text() for line in self.multi_fields[item]]
         self.multi_field_values[item] = value
+
+    def handle_title_changed(self, title):
+        self.title = title
+        self.changed_variables['title'] = title
+
+    # Closes popup and edits component parameters, signals parent to update graphics
+    def accept(self):
+        if not self.validate_input():
+            return
+
+        for key, value in self.multi_field_values.items():
+            self.changed_variables[key] = value
+        arg = []
+        for key in self.changed_variables.keys():
+            if not key == 'title':
+                arg.append((self.component, key.lower(), self.changed_variables[key]))
+
+        if arg:
+            if not self.new_component:
+                self.aircraft.update_component(arg)
+                self.component_changed.emit(self.component)
+            else:
+                params = {}
+                for line in arg:
+                    params[line[1]] = line[2]
+                params['title'] = self.title
+                self.aircraft.add_component(self.component_type, params)
+                self.component_changed.emit(self.title)
+                self.title_changed.emit('', self.title)
+                super().accept()
+                return
+        else:
+            self.component_changed.emit(self.component)
+
+        if 'title' in self.changed_variables:
+            title = self.title
+            self.aircraft.aero_components[title] = self.aircraft.aero_components[self.component]
+            self.aircraft.aero_components.pop(self.component)
+            self.aircraft.update_component([(title, 'title', title)])
+            self.title_changed.emit(self.component, self.title)
+        super().accept()
+
+    def validate_input(self):
+
+        validated = True
+        for label, line_edit in self.input_fields.items():
+            text = line_edit.text().strip()
+            if not text:
+                line_edit.setStyleSheet("border: 1px solid red;")
+
+            try:
+                float(text)
+                line_edit.setStyleSheet("")
+            except ValueError:
+                line_edit.setStyleSheet("border: 1px solid red;")
+                validated = False
+
+        if 'title' in self.changed_variables and self.new_component:
+
+            if self.changed_variables['title'] in self.aircraft.aero_components:
+                self.title_edit.setStyleSheet("border: 1px solid red;")
+                validated = False
+
+        return validated
