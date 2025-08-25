@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QMainWindow, QHBoxLayout, QFileDialog
-from WUADS.gui.toolbox.toolbox_main import ToolBox
-from WUADS.aircraft import Aircraft
-from WUADS.gui.graphics import graphics
+from .toolbox.toolbox_main import ToolBox
+from ..aircraft import Aircraft
+from .graphics import graphics
 
 # git is working
 
@@ -49,8 +49,6 @@ class MainWindow(QMainWindow):
         save_aircraft.triggered.connect(self.save_config)
 
         file_menu.addAction('Close')
-        settings_menu = menu.addMenu('&Settings')
-        view_menu = menu.addMenu('&View')
 
     def load_config(self, *args):
         file_dialog = QFileDialog(self)

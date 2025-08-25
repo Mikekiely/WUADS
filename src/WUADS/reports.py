@@ -1,4 +1,4 @@
-from WUADS.aircraft import Aircraft
+from .aircraft import Aircraft
 import os
 
 def weights_report(aircraft: Aircraft, filename=None):

@@ -1,7 +1,7 @@
 import os
 
 from PySide6.QtWidgets import QListWidget, QFileDialog, QDialog, QVBoxLayout, QTextEdit, QMessageBox
-from WUADS.reports import weights_report, mission_profile_report
+from ...reports import weights_report, mission_profile_report
 
 class analysis_list(QListWidget):
 

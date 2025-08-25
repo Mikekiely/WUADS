@@ -1,8 +1,8 @@
 import os
 import subprocess
 
-from WUADS.flight_conditions import FlightConditions
-from WUADS.avl_run import run_AVL, AVL_input, import_coefficients
+from .flight_conditions import FlightConditions
+from .avl_run import run_AVL, AVL_input, import_coefficients
 import numpy as np
 import sys
 

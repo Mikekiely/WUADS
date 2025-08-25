@@ -287,9 +287,6 @@ class ToolBox(QToolBox):
         if popup.exec() == QDialog.Accepted:
             self.refresh_mission_profile_list()
 
-        # if ok and text:
-        #     self.mission_profile_list.addItem(text)
-        #     mission_profile_types[text] = {}  # Initialize with empty dictionary
 
     def handleRemoveMissionProfileSegment(self):
         selected_item = self.mission_profile_list.currentItem()

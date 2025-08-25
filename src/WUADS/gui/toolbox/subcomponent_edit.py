@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QFormLayout, QWidget, QDialogButtonBox
-from WUADS.components.component import Component
+from ...components.component import Component
 
 subcomponent_types = {'Nose Landing Gear': 'nose_landing_gear',
                       'Main Landing Gear': 'main_landing_gear',

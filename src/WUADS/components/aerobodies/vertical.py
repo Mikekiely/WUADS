@@ -1,4 +1,4 @@
-from WUADS.components.aerobodies.wing import Wing
+from .wing import Wing
 import numpy as np
 
 

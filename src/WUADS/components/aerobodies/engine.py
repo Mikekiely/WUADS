@@ -1,4 +1,4 @@
-from WUADS.components.component import PhysicalComponent
+from ..component import PhysicalComponent
 import numpy as np
 
 

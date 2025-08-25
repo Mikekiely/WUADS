@@ -1,7 +1,7 @@
 import logging
 
-from WUADS.components.component import Component
-from WUADS.components.aerobodies.wing import Wing
+from .component import Component
+from .aerobodies.wing import Wing
 import numpy as np
 logger = logging.getLogger(__name__)
 
