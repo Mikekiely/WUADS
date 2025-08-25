@@ -93,6 +93,7 @@ components:
 
 propulsion:
   engine_type: 'turbofan'   # Turbofan of propeller currently
+  thrust_cruise: 6813
 
 subsystem_parameters:
   subsystems: # Subsystems and their centers of gravity
@@ -147,20 +148,46 @@ mission_profile:
     start_velocity: 879
     end_velocity: 778
     start_altitude: 10000
-    end_altitude: 36000
+    end_altitude: 35000
   cruise:
     segment_type: cruise
-    mach: .85
+    mach: .8
     altitude: 35000
     find_range: True
   descent:
     segment_type: descent
     weight_fraction: .995
+  climb_4:
+    run_sim: True
+    segment_type: climb
+    start_velocity: 421.952
+    end_velocity: 421.952
+    start_altitude: 1500
+    end_altitude: 10000
+  climb_5:
+    run_sim: True
+    segment_type: climb
+    start_velocity: 421.952
+    end_velocity: 518.427675
+    start_altitude: 10000
+    end_altitude: 20000
+  cruise_diversion:
+    segment_type: cruise
+    mach: .5003
+    altitude: 20000
+    range: 200
+    find_range: False
+  descent_2:
+    segment_type: descent
+    weight_fraction: .998
   loiter:
     segment_type: loiter
     altitude: 1500
     time: .5
     mach: .25
+  descent_3:
+    segment_type: descent
+    weight_fraction: .999
   landing:
     segment_type: landing
     weight_fraction: .995
