@@ -177,7 +177,8 @@ class cruise(MissionSegment):
         self.find_range = find_range
         if find_range:
             self.range = range
-            self.input_params.remove('range')
+            if hasattr(self.input_params, 'range'):
+                self.input_params.remove('range')
         else:
             self.range = range
         self.run_sim = True
