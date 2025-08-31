@@ -85,8 +85,20 @@ class Engine(PhysicalComponent):
         return self.weight
 
     def set_cg(self):
-        self.cg = [self.xle + self.length/2, self.yle, self.zle]
-        self.inertia = [x * self.weight for x in self.cg]
+        """
+        Set the center of gravity of the nacelle.
+
+        """
+        if isinstance(self.xle, list):
+            xcg = sum(self.xle) / len(self.xle)
+            ycg = sum(self.yle) / len(self.yle)
+            zcg = sum(self.zle) / len(self.zle)
+        else:
+            xcg = self.xle
+            ycg = self.yle
+            zcg = self.zle
+        self.cg = [self.length * .45 + xcg, ycg, zcg]
+        super().set_cg()
 
     def raymer_weight(self, aircraft, wdg):
         """
