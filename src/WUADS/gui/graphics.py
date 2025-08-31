@@ -277,7 +277,7 @@ def plot_component(component):
         x, y, z = plot_wing(component.sections[0])
         grid = pv.StructuredGrid(x, y, z)
         mesh = grid.extract_surface().triangulate()
-        if len(component.sections > 1):
+        if len(component.sections) > 1:
             for sec in component.sections[1:]:
                 x, y, z = plot_wing(sec)
                 grid = pv.StructuredGrid(x, y, z)
