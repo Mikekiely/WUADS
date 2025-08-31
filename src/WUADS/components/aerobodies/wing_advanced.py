@@ -39,9 +39,9 @@ class Wing_advanced(Wing):
         self.area = 0
         self.cref = 0
         for sec in self.sections:
-            self.span += sec.span * 2
-            self.area += sec.area * 2
-            self.cref += sec.cref * sec.area * 2
+            self.span += sec.span
+            self.area += sec.area
+            self.cref += sec.cref * sec.area
         self.cref *= 1 / self.area
         self.taper = self.sections[-1].ct / self.sections[0].cr
         self.aspect_ratio = self.span**2 / self.area
@@ -133,7 +133,8 @@ class wing_section(Wing):
             self.xle_tip = self.xle + dx_le
             self.area = .5 * self.span * (self.ct + self.cr)
         else:
-            # self.input_params['span'] *= 2
+            if 'length' in self.input_params:
+                self.input_params['span'] = self.input_params['length'] * 2
             super().__init__(self.input_params)
 
         self.xle_tip = self.xle + self.span * np.tan(self.sweep_le)
