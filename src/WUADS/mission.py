@@ -1,4 +1,4 @@
-from src.WUADS.mission_segments import takeoff, climb, cruise, descent, landing, loiter, weight_drop
+from .mission_segments import takeoff, climb, cruise, descent, landing, loiter, weight_drop
 import logging
 
 logger = logging.getLogger(__name__)
