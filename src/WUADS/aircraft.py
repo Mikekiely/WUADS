@@ -15,13 +15,15 @@ from .components.aerobodies.fuselage import Fuselage
 from .components.aerobodies.horizontal import Horizontal
 from .components.aerobodies.vertical import Vertical
 from .components.aerobodies.engine import Engine
+from .components.aerobodies.wing_advanced import Wing_advanced
 
 AEROBODY_CLASSES = {
     "wing": Wing,
     "fuselage": Fuselage,
     "horizontal": Horizontal,
     "vertical": Vertical,
-    "engine": Engine
+    "engine": Engine,
+    "wing_advanced": Wing_advanced,
 }
 
 import logging
