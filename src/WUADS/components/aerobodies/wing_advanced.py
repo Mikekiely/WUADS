@@ -135,8 +135,11 @@ class wing_section(Wing):
         else:
             if 'length' in self.input_params:
                 self.input_params['span'] = self.input_params['length'] * 2
+                self.length = self.input_params['length']
+            else:
+                self.length = self.input_params['span'] / 2
             super().__init__(self.input_params)
 
-        self.xle_tip = self.xle + self.span * np.tan(self.sweep_le)
-        self.yle_tip = self.yle + self.span
-        self.zle_tip = self.zle + self.span * np.tan(self.dihedral)
+        self.xle_tip = self.xle + self.length * np.tan(self.sweep_le)
+        self.yle_tip = self.yle + self.length
+        self.zle_tip = self.zle + self.length * np.tan(self.dihedral)
