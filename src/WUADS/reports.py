@@ -100,7 +100,7 @@ def mission_profile_report(aircraft, filename=None):
         w_fuel = 0
         for seg in aircraft.mission.mission_profile:
             w_fuel += seg.fuel_burnt
-        w_fuel += aircraft.mission.mission_profile[-1].reserved_fuel
+        w_fuel += aircraft.mission.mission_profile[-1].reserve_fuel
 
         f.write("{:<15} {:>15.2f} {:>17}\n\n".format('Total', aircraft.mission.range, w_fuel))
 
