@@ -73,6 +73,18 @@ def weights_report(aircraft: Aircraft, filename=None):
                                                                    name_width=max_variable_name_length,
                                                                    weight_width=12))
 
+        if aircraft.misc_components:
+            f.write('================================================\n')
+            f.write('          Misc Weights\n\n')
+            f.write("{:>35}{:>12}\n".format('Weight (lbs)', 'x cg (ft)'))
+            f.write("{:>39}\n".format('------------------------------------------'))
+            for comp in aircraft.misc_components.values():
+                f.write("{:<{name_width}} {:>{weight_width}.2f}{:>14.2f}\n".format(comp.title,
+                                                                                   comp.weight,
+                                                                                   comp.cg[0],
+                                                                                   name_width=max_variable_name_length,
+                                                                                   weight_width=12))
+
 def mission_profile_report(aircraft, filename=None):
 
     directory = aircraft.output_dir

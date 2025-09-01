@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "WUADS"
-version = "0.1.3"
+version = "0.1.4"
 description = "Conceptual aircraft design package with empirical and numerical methods"
 readme = "README.md"
 requires-python = ">=3.8"
