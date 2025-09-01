@@ -83,7 +83,8 @@ class Mission:
                 seg_findrange = seg
                 break
             else:
-                logger.info(f"Analyzing conditions for mission segment {seg.title}")
+                if not mute_output:
+                    logger.info(f"Analyzing conditions for mission segment {seg.title}")
                 seg.breguet_range(aircraft, wi=wi)
                 wi *= seg.weight_fraction
 
@@ -96,16 +97,19 @@ class Mission:
                 if seg.find_range:
                     break
                 else:
-                    logger.info(f"Analyzing conditions for mission segment {seg.title}")
+                    if not mute_output:
+                        logger.info(f"Analyzing conditions for mission segment {seg.title}")
                     seg.breguet_range(aircraft, wn=wn)
                     wn = seg.wi
 
-            logger.info(f"Finding maximum range")
+            if not mute_output:
+                logger.info(f"Finding maximum range")
             seg_findrange.set_range(aircraft, wi=wi, wn=wn)
 
         # Sum total mission range
         max_range = sum(seg.range for seg in mission_profile)
-        logger.info(f"Analysis complete, maximum range is {max_range}")
+        if not mute_output:
+            logger.info(f"Analysis complete, maximum range is {max_range}")
         aircraft.range = max_range
         self.mission_profile = mission_profile  # store updated mission profile
         self.range = max_range
