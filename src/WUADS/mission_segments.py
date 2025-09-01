@@ -295,6 +295,7 @@ class loiter(MissionSegment):
         self.time = time
         self.segment_type = 'loiter'
         self.run_sim = run_sim
+        self.best_velocity = best_velocity
         if not mach:
             self.mach = .25
 
