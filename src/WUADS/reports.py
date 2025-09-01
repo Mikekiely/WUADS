@@ -97,7 +97,12 @@ def mission_profile_report(aircraft, filename=None):
         f.write('================================================\n')
         # f.write(f'Maximum Range: {aircraft.}')
         f.write("{:>32} {:>19}\n".format('Range (nmi)', 'Fuel Burnt (lbs)'))
-        f.write("{:<15} {:>15.2f} {:>17}\n\n".format('Total', aircraft.mission.range, aircraft.mission.w_fuel))
+        w_fuel = 0
+        for seg in aircraft.mission.mission_profile:
+            w_fuel += seg.fuel_burnt
+        w_fuel += aircraft.mission.mission_profile[-1].reserved_fuel
+
+        f.write("{:<15} {:>15.2f} {:>17}\n\n".format('Total', aircraft.mission.range, w_fuel))
 
         for seg in aircraft.mission.mission_profile:
             f.write("{:<15} {:>15.2f} {:>17.2f}\n".format(seg.segment_type, float(seg.range), float(seg.fuel_burnt)))
