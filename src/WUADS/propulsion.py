@@ -81,6 +81,7 @@ class turbofan(engine):
         """
         super().__init__(n_engines)
         if engine_data_file:
+            self.engine_data_file = engine_data_file
             self.load_data_file(engine_data_file)
 
         self.scale_performance(h_cruise, mach_cruise, n_engines=n_engines, thrust_sea_level=thrust_sea_level,
@@ -291,8 +292,8 @@ class turbofan(engine):
             wb.save(file_name)
 
     def load_data_file(self, file_name):
-        thrust_df = pd.read_excel(file_name, sheet_name="Thrust", skiprows=3, header=0, index_col=0)
-        sfc_df = pd.read_excel(file_name, sheet_name="sfc", skiprows=3, header=0, index_col=0)
+        thrust_df = pd.read_excel(file_name, sheet_name="Thrust", skiprows=2, header=0, index_col=0)
+        sfc_df = pd.read_excel(file_name, sheet_name="sfc", skiprows=2, header=0, index_col=0)
 
         self.altitude_ref = thrust_df.index.to_list()
         self.mach_ref = thrust_df.columns.tolist()

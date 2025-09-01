@@ -189,6 +189,7 @@ class Aircraft:
             thrust_cruise = kwargs.get('thrust_cruise', None)
             sfc_sea_level = kwargs.get('sfc_sea_level', None)
             sfc_cruise = kwargs.get('sfc_cruise', None)
+            engine_data_file = kwargs.get('engine_data_file', None)
 
             engine = turbofan(h_cruise=self.h_cruise,
                               mach_cruise=self.mach_cruise,
@@ -196,7 +197,9 @@ class Aircraft:
                               thrust_sea_level=thrust_sea_level,
                               thrust_cruise=thrust_cruise,
                               sfc_sea_level=sfc_sea_level,
-                              sfc_cruise=sfc_cruise)
+                              sfc_cruise=sfc_cruise,
+                              engine_data_file=engine_data_file)
+
         elif engine_type.lower() == 'propeller':
             horse_power = kwargs.get('horse_power', None)
             fuel_consumption_rate = kwargs.get('fuel_consumption_rate', None)
