@@ -107,26 +107,46 @@ class turbofan(engine):
             mach = self.mach_ref[-1] - .001
 
         # Find values to interpolate between
-        for i in range(len(self.altitude_ref)):
-            if height < self.altitude_ref[i]:
-                if i > 0:
+
+        # altitude
+        if height <= self.altitude_ref[0]:
+            x_indx_low = 0
+            x_indx_high = 1
+            x1 = self.altitude_ref[0]
+            x2 = self.altitude_ref[1]
+        elif height >= self.altitude_ref[-1]:
+            x_indx_low = len(self.altitude_ref) - 2
+            x_indx_high = len(self.altitude_ref) - 1
+            x1 = self.altitude_ref[-2]
+            x2 = self.altitude_ref[-1]
+        else:
+            for i in range(1, len(self.altitude_ref)):
+                if height < self.altitude_ref[i]:
                     x_indx_low = i - 1
                     x_indx_high = i
                     x1 = self.altitude_ref[i - 1]
                     x2 = self.altitude_ref[i]
-                else:
-                    x_indx_low = 0
-                    x_indx_high = 1
-                    x1 = self.altitude_ref[0]
-                    x2 = self.altitude_ref[1]
-                break
-        for i in range(len(self.mach_ref)):
-            if mach < self.mach_ref[i]:
-                y_indx_low = i - 1
-                y_indx_high = i
-                y1 = self.mach_ref[i - 1]
-                y2 = self.mach_ref[i]
-                break
+                    break
+
+        # Mach
+        if mach <= self.mach_ref[0]:
+            y_indx_low = 0
+            y_indx_high = 1
+            y1 = self.mach_ref[0]
+            y2 = self.mach_ref[1]
+        elif mach >= self.mach_ref[-1]:
+            y_indx_low = len(self.mach_ref) - 2
+            y_indx_high = len(self.mach_ref) - 1
+            y1 = self.mach_ref[-2]
+            y2 = self.mach_ref[-1]
+        else:
+            for i in range(1, len(self.mach_ref)):
+                if mach < self.mach_ref[i]:
+                    y_indx_low = i - 1
+                    y_indx_high = i
+                    y1 = self.mach_ref[i - 1]
+                    y2 = self.mach_ref[i]
+                    break
 
         f11 = self.sfc_input[x_indx_low][y_indx_low]
         f12 = self.sfc_input[x_indx_low][y_indx_high]
