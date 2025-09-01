@@ -283,7 +283,7 @@ class descent(MissionSegment):
 
 class loiter(MissionSegment):
     input_params = ['title', 'altitude', 'time', 'mach']
-    def __init__(self, title='loiter', altitude=0, time=0, mach=None, **kwargs):
+    def __init__(self, title='loiter', altitude=0, time=0, mach=None, run_sim=False, **kwargs):
         """
         Initiate a loiter segment
         :param altitude: Loiter altitude (ft)
@@ -294,23 +294,33 @@ class loiter(MissionSegment):
         self.altitude = altitude
         self.time = time
         self.segment_type = 'loiter'
+        self.run_sim = run_sim
         if not mach:
             self.mach = .25
 
     def breguet_range(self, aircraft, wi=None, wn=None):
         K = 0
-        for seg in aircraft.mission.mission_profile:
-            if hasattr(seg, 'K'):
-                K = seg.K
-                self.mach = seg.mach
-                break
+        cd0, cdw = aircraft.get_cd0(self.altitude, self.mach)
 
         if wi:
             weight = wi
         else:
             weight = wn
 
-        cd0, _ = aircraft.get_cd0(self.altitude, self.mach)
+        if self.run_sim:
+            AVL_input(aircraft, weight, mach=self.mach)
+            run_AVL(self.flight_conditions, aircraft, cd0=cd0, cdw=cdw)
+
+            self.cl, self.cd = import_coefficients(aircraft, self)
+            K = (self.cd - cd0) / self.cl ** 2
+            self.K = K
+        else:
+            for seg in aircraft.mission.mission_profile:
+                if hasattr(seg, 'K'):
+                    K = seg.K
+                    self.mach = seg.mach
+                    break
+
         self.cd0 = cd0
         self.flight_conditions = FlightConditions(self.altitude, self.mach)
         #TODO fix this, add an actual K calculator
