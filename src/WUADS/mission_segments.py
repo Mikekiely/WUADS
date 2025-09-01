@@ -298,6 +298,8 @@ class loiter(MissionSegment):
         self.best_velocity = best_velocity
         if not mach:
             self.mach = .25
+        else:
+            self.mach = mach
 
     def breguet_range(self, aircraft, wi=None, wn=None):
         K = 0
