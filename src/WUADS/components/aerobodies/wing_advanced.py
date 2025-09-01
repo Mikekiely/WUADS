@@ -12,10 +12,15 @@ class Wing_advanced(Wing):
 
     def __init__(self, params):
         self.input_params = params
+        self.component_type = self.__class__.__name__
+        for variable_name, variable_value in params.items():
+            if hasattr(self, variable_name.lower()):
+                setattr(self, variable_name.lower(), variable_value)
         self.create_sections()
 
     def create_sections(self):
         # Create Sections
+        self.sections = []
         first_section = True
 
         for section_name, section_params in self.input_params['sections'].items():
