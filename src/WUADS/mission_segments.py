@@ -283,7 +283,7 @@ class descent(MissionSegment):
 
 class loiter(MissionSegment):
     input_params = ['title', 'altitude', 'time', 'mach']
-    def __init__(self, title='loiter', altitude=0, time=0, mach=None, run_sim=False, **kwargs):
+    def __init__(self, title='loiter', altitude=0, time=0, mach=None, run_sim=False, best_velocity=False, **kwargs):
         """
         Initiate a loiter segment
         :param altitude: Loiter altitude (ft)
@@ -301,7 +301,8 @@ class loiter(MissionSegment):
     def breguet_range(self, aircraft, wi=None, wn=None):
         K = 0
         cd0, cdw = aircraft.get_cd0(self.altitude, self.mach)
-
+        self.cd0 = cd0
+        self.flight_conditions = FlightConditions(self.altitude, self.mach)
         if wi:
             weight = wi
         else:
@@ -321,17 +322,20 @@ class loiter(MissionSegment):
                     self.mach = seg.mach
                     break
 
-        self.cd0 = cd0
-        self.flight_conditions = FlightConditions(self.altitude, self.mach)
+            self.cl = weight / (self.flight_conditions.q * aircraft.sref)
+            self.cd = cd0 + K * self.cl ** 2
+
+
+
+
         #TODO fix this, add an actual K calculator
-        self.velocity = np.sqrt(2 * wn / (self.flight_conditions.rho * aircraft.sref) * np.sqrt(K / (3 * cd0)))
-        self.mach = self.velocity / self.flight_conditions.a
-        self.flight_conditions = FlightConditions(self.altitude, self.mach)
+        if self.best_velocity:
+            self.velocity = np.sqrt(2 * wn / (self.flight_conditions.rho * aircraft.sref) * np.sqrt(K / (3 * cd0)))
+            self.mach = self.velocity / self.flight_conditions.a
+            self.flight_conditions = FlightConditions(self.altitude, self.mach)
         E = self.time * 3600
 
-        self.cl = weight / (self.flight_conditions.q * aircraft.sref)
 
-        self.cd = cd0 + K * self.cl**2
 
         self.thrust = self.cd * self.flight_conditions.q * aircraft.sref
         self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.flight_conditions.altitude,
