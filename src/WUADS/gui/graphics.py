@@ -272,7 +272,7 @@ def plot_component(component):
             mesh = mesh + temp + temp.reflect([0, 1, 0])
 
         return mesh
-    elif component.component_type == 'Wing_Advanced':
+    elif component.component_type.lower() == 'wing_advanced':
         # section 1
         x, y, z = plot_wing(component.sections[0])
         grid = pv.StructuredGrid(x, y, z)
