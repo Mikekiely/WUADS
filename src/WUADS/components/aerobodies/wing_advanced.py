@@ -47,6 +47,7 @@ class Wing_advanced(Wing):
             self.span += sec.span
             self.area += sec.area
             self.cref += sec.cref * sec.area
+            self.s_wet += sec.s_wet
         self.cref *= 1 / self.area
         self.taper = self.sections[-1].ct / self.sections[0].cr
         self.aspect_ratio = self.span**2 / self.area
@@ -61,6 +62,7 @@ class Wing_advanced(Wing):
         self.sweep = np.arctan((self.sections[-1].xle_tip - self.sections[0].xle)/ (self.span/2))
         self.sweep = np.rad2deg(self.sweep)
         self.set_sweep_angle(self.sweep, self.sweep_location)
+
 
 
         if 'airfoils' in self.input_params:
@@ -94,6 +96,8 @@ class Wing_advanced(Wing):
         for variable_name, variable_value in self.input_params.items():
             if hasattr(self, variable_name.lower()) and variable_name.lower() != 'sections':
                 setattr(self, variable_name.lower(), variable_value)
+
+
 
 class wing_section(Wing):
     input_params = {}
