@@ -43,6 +43,7 @@ class Wing_advanced(Wing):
         self.span = 0
         self.area = 0
         self.cref = 0
+        self.swet = 0
         for sec in self.sections:
             self.span += sec.span
             self.area += sec.area
