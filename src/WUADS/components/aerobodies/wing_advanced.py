@@ -2,7 +2,7 @@ from .wing import Wing
 import numpy as np
 
 class Wing_advanced(Wing):
-    input_params = {}
+    params = {}
     definition_type = "Sections"
     avl_sections = []
     twist = []
@@ -11,7 +11,7 @@ class Wing_advanced(Wing):
     sections = []
 
     def __init__(self, params):
-        self.input_params = params
+        self.params = params
         self.component_type = self.__class__.__name__
         for variable_name, variable_value in params.items():
             if hasattr(self, variable_name.lower()):
@@ -23,7 +23,7 @@ class Wing_advanced(Wing):
         self.sections = []
         first_section = True
 
-        for section_name, section_params in self.input_params['sections'].items():
+        for section_name, section_params in self.params['sections'].items():
             if first_section:
                 section_params["xle"] = self.xle
                 section_params["yle"] = self.yle
@@ -66,10 +66,10 @@ class Wing_advanced(Wing):
 
 
 
-        if 'airfoils' in self.input_params:
+        if 'airfoils' in self.params:
             self.airfoil = []
             self.twist = []
-            for af in self.input_params['airfoils'].values():
+            for af in self.params['airfoils'].values():
                 self.twist.append(af['twist'])
                 self.airfoil.append(af['airfoil'])
 
@@ -94,7 +94,7 @@ class Wing_advanced(Wing):
 
     def set_variables(self):
         # Set variables
-        for variable_name, variable_value in self.input_params.items():
+        for variable_name, variable_value in self.params.items():
             if hasattr(self, variable_name.lower()) and variable_name.lower() != 'sections':
                 setattr(self, variable_name.lower(), variable_value)
 
