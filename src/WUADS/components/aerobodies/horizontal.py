@@ -14,7 +14,6 @@ class Horizontal(Wing):
 
         params: <dict> list of parameters to edit
         """
-
         self.weight_averages = [.2, .4, .4]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
         self.control_surface_ratio = .2
         super().__init__(params)

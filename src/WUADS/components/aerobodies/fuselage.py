@@ -14,6 +14,7 @@ class Fuselage(PhysicalComponent):
 
         :param <dict> params: list of parameters to edit
         """
+
         # Default Values
         self.length = 0          # Length Tip to Nose (ft)
         self.width = 0           # Width (ft)
@@ -29,7 +30,6 @@ class Fuselage(PhysicalComponent):
         self.fuse_mounted_lg = True  # Whether the landing gear is mounted
 
         self.weight_averages = [.5, 0, .5]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
-
 
         super().__init__(params)
 

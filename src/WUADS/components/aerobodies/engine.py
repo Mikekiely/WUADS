@@ -18,6 +18,7 @@ class Engine(PhysicalComponent):
             params: <dict> list of parameters to edit
         """
 
+
         # Default Values
         self.aero_body = False
         self.length = 0          # Nacelle Length (ft)
@@ -38,8 +39,8 @@ class Engine(PhysicalComponent):
         self.weight_controls = 0
         self.weight_starter = 0
         self.weight_fuel_system = 0
-
         super().__init__(params)
+
         # Find wetted surface area
         self.s_wet = np.pi * self.diameter * self.length
 

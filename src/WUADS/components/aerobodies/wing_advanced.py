@@ -8,6 +8,42 @@ class Wing_advanced(Wing):
 
 
     def __init__(self, params):
+        # Default Values
+        self.title = ''
+        self.sweep = 0  # c/4 sweep (rad)
+        self.sweep_location = .25  # location of the sweep definition (as a percentage of the chord)
+        self.sweep_deg = 0  # c/4 sweep (Deg)
+        self.sweep_le = 0  # Leading edge sweep (rad)
+        self.sweep_mid = 0  # c/2 sweep (rad)
+        self.sweep_te = 0  # Trailing edge sweep (rad)
+        self.sweep_quarter_chord = None
+        self.area = 0  # Planform surface area (ft^2)
+        self.aero_body = True
+        self.span = 0  # Wingspan (ft)
+        self.cref = 0  # Mean Aerodynamic Chord (ft)
+        self.airfoil = ''
+        self.aspect_ratio = 0  # Aspect Ratio
+        self.taper = 0  # Taper Ratio
+        self.cr = 0  # Root Chord
+        self.ct = 0  # Tip Chord
+        self.Q = 1  # interference factor
+        self.laminar_percent = .1  # Percentage of laminar flow
+        self.dihedral = 0  # Dihedral angle (rad)
+        self.dihedral_deg = 0  # Dihedral angle (deg)
+        self.tc = .12  # Airfoil Thickness (At Root)
+        self.hc = .008  # Camber
+        self.weight_averages = [.8, .2, 0]  # [Raymer, Torenbeek, NASA]
+        # self.weight_averages = [.15, .85, 0]
+        self.control_surface_ratio = .1
+        self.cd0 = 0
+        self.laminar_percent = .05
+        self.winglet = {}
+        self.xc = .35  # x value at mean camber line
+        self.avl_sections = []
+        self.xle = 0
+        self.yle = 0
+        self.zle = 0
+        super()._load_variables(params)
 
         self.params = {}
         self.definition_type = "Sections"

@@ -7,17 +7,6 @@ class FlightConditions:
     Calculates atmospheric and flight conditions for a given altitude and Mach number.
 
     """
-    pressure = 0
-    temperature = 0
-    rho0 = 0
-    mu = 0
-    a = 0
-    velocity = 0
-    mach = 0
-    q = 0
-    re = 0
-    altitude = 0
-    gamma = 1.4
 
     def __init__(self, altitude, mach):
         """
@@ -26,6 +15,19 @@ class FlightConditions:
         :param float altitude: altitude (ft)
         :param float mach: mach number
         """
+
+        self.pressure = 0
+        self.temperature = 0
+        self.rho0 = 0
+        self.mu = 0
+        self.a = 0
+        self.velocity = 0
+        self.mach = 0
+        self.q = 0
+        self.re = 0
+        self.altitude = 0
+        self.gamma = 1.4
+
         # Constants
         g = 32.2  # gravity
         t0 = 519  # Rankine

@@ -19,19 +19,25 @@ class Component:
         Parameters:
         :param <dict> params: list of parameters to edit.
         """
-
-        self.params = {}  # Input parameters, used to edit the component later
-        self.title = ""  # Name of component
-        self.component_type = ""  # Component class type
+        if not hasattr(self, 'params'):
+            self.params = {}  # Input parameters, used to edit the component later
+        if not hasattr(self, 'title'):
+            self.title = ""  # Name of component
+        if not hasattr(self, 'component_type'):
+            self.component_type = ""  # Component class type
 
         self.weight = 0.0  # Overall weight
 
         self.cg = [0, 0, 0]  # Center of gravity (x, y, z)
         self.inertia = [0, 0, 0]  # Moments of inertia (ix, iy, iz)
-        self.aero_body = False
+        if not hasattr(self, 'aero_body'):
+            self.aero_body = False
 
         self.params = params
         self.component_type = self.__class__.__name__
+        self._load_variables(params)
+
+    def _load_variables(self, params):
         for variable_name, variable_value in params.items():
             if hasattr(self, variable_name.lower()):
                 setattr(self, variable_name.lower(), variable_value)
@@ -85,26 +91,34 @@ class PhysicalComponent(Component):
 
         :param <dict> params: list of parameters to edit
         """
-
         # Default Values
-        self.avl_sections = []  # Sections to input into AVL
-        self.attachment = ""  # What component is this attached to, eg. nacelle attached to wing
+        if not hasattr(self, 'avl_sections'):
+            self.avl_sections = []  # Sections to input into AVL
+        if not hasattr(self, 'attachment'):
+            self.attachment = ""  # What component is this attached to, eg. nacelle attached to wing
         self.cd0 = 0.0  # Parasite drag coefficient
         self.cdw = 0.0  # Wave drag coefficient
         self.xle = 0.0  # Leading edge x coordinate
         self.yle = 0.0  # Leading edge y coordinate
         self.zle = 0.0  # Leading edge z coordinate
 
-        self.laminar_percent = 0.1  # Percentage experiencing laminar flow
-        self.Q = 1.0  # Interference factor (for parasite drag)
-        self.s_wet = 0  # Wetted Surface area
+        if not hasattr(self, 'laminar_percent'):
+            self.laminar_percent = 0.1  # Percentage experiencing laminar flow
+        if not hasattr(self, 'Q'):
+            self.Q = 1.0  # Interference factor (for parasite drag)
+        if not hasattr(self, 's_wet'):
+            self.s_wet = 0  # Wetted Surface area
 
         self.weight_raymer = 0.0  # Weight using Raymer estimation method
         self.weight_torenbeek = 0.0  # Weight using Torenbeek method
         self.weight_nasa = 0  # Weight using NASA FLOPS Method
-        self.weight_averages = [1 / 3, 1 / 3,
-                           1 / 3]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
+        if not hasattr(self, 'weight_averages'):
+            self.weight_averages = [1 / 3, 1 / 3,
+                               1 / 3]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
         super().__init__(params)
+
+    def _load_variables(self, params):
+        super()._load_variables(params)
 
     def parasite_drag(self, form_factor, l_char, flight_conditions, sref):
         """

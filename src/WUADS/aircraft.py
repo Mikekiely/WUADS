@@ -412,8 +412,9 @@ class Aircraft:
         mission_profile_params = {}
         for seg in self.mission.mission_profile:
             seg_params = {}
-            for item in seg.params:
+            for item in seg.input_params:
                 seg_params[item] = getattr(seg, item)
+                print(seg_params[item])
             mission_profile_params[seg.title] = seg_params
 
         data = {
