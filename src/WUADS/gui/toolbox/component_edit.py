@@ -99,7 +99,7 @@ class component_edit(QDialog):
             item = item.lower()
             if item == 'title':
                 continue
-            # Populate line edits
+            # Get Value
             try:
                 if new_component:
                     val = ''
@@ -111,6 +111,17 @@ class component_edit(QDialog):
             except KeyError:
                 val = ''
 
+            # Set label and tooltips
+            if item in self.variable_labels.keys():
+                label = QLabel(self.variable_labels[item])
+            else:
+                label = QLabel(item.title())
+
+            try:
+                label.setToolTip(self.tool_tips[item])
+            except KeyError:
+                pass
+
             if isinstance(val, list):
                 container = QWidget()
                 layout = QHBoxLayout(container)
@@ -118,40 +129,17 @@ class component_edit(QDialog):
                 line_edits = []
                 for v in val:
                     line_edit = QLineEdit(str(v))
+                    line_edit.textChanged.connect(lambda _, var=item: self.multi_field_changed(var))
                     layout.addWidget(line_edit)
                     line_edits.append(line_edit)
                 self.multi_fields[item] = line_edits
                 self.multi_field_values[item] = val
 
-                for le in line_edits:
-                    le.textChanged.connect(lambda _, var=item: self.multi_field_changed(item))
-
-                if item in self.variable_labels.keys():
-                    label = QLabel(self.variable_labels[item])
-                else:
-                    label = QLabel(item.title())
-
-                try:
-                    label.setToolTip(self.tool_tips[item])
-
-                except KeyError:
-                    pass
                 form.addRow(label, container)
             else:
                 line_edit = QLineEdit()
                 line_edit.setText(str(val))
                 line_edit.textChanged.connect(lambda text, var=item: self.text_changed(var, text))
-
-                if item in self.variable_labels.keys():
-                    label = QLabel(self.variable_labels[item])
-                else:
-                    label = QLabel(item.title())
-
-                try:
-                    label.setToolTip(self.tool_tips[item])
-
-                except KeyError:
-                    pass
                 form.addRow(label, line_edit)
                 self.input_fields[item] = line_edit
 
@@ -245,9 +233,11 @@ class component_edit(QDialog):
             text = line_edit.text().strip()
             if not text:
                 line_edit.setStyleSheet("border: 1px solid red;")
-
             try:
-                float(text)
+                if label == 'title' or label == 'component_type' or label == 'attachment' or label == 'definition_type':
+                    str(text)
+                else:
+                    float(text)
                 line_edit.setStyleSheet("")
             except ValueError:
                 line_edit.setStyleSheet("border: 1px solid red;")
