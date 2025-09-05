@@ -311,7 +311,7 @@ class Aircraft:
         self.inertia = [i + ix for i, ix in zip(self.inertia, self.useful_load.inertia)]
         self.cg = [i / (self.weight_empty / fudge_factor + self.useful_load.weight) for i in self.inertia]
 
-    def update_component(self, variables, maintain_aspect_ratio=False):
+    def update_component(self, variables, **kwargs):
         """
         Updates component and recalculates weight and parasite drag
 
@@ -334,7 +334,7 @@ class Aircraft:
             value = var[2]
             # Check if title is in aero components
             if title in self.aero_components:
-                self.aero_components[title].update(variable, value, maintain_aspect_ratio=maintain_aspect_ratio)
+                self.aero_components[title].update(variable, value, kwargs)
 
         # Re-initialize the weights and drag
         self.sref = self.aero_components['Main Wing'].area
@@ -410,7 +410,7 @@ class Aircraft:
         mission_profile_params = {}
         for seg in self.mission.mission_profile:
             seg_params = {}
-            for item in seg.input_params:
+            for item in seg.params:
                 seg_params[item] = getattr(seg, item)
             mission_profile_params[seg.title] = seg_params
 

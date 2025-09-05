@@ -238,7 +238,7 @@ class Wing(PhysicalComponent):
 
         super().set_cg()
 
-    def update(self, variable, value, maintain_aspect_ratio=True):
+    def update(self, variable, value, kwargs):
         """
         Updates the wing parameters. Note the whole aircraft will need to be re-evaulated to determine weights and drag
 
@@ -247,6 +247,7 @@ class Wing(PhysicalComponent):
         :param boolean maintain_aspect_ratio: if set to true and the area is altered, the span will be altered to maintain the current
                                    aspect ratio
         """
+        maintain_aspect_ratio = kwargs.get('maintain_aspect_ratio', True)
 
         vars_taper = ['xle', 'yle', 'zle', 'area', 'span', 'sweep', 'dihedral', 'taper']
         vars_chord = ['xle', 'yle', 'zle', 'span', 'cr', 'ct', 'sweep', 'dihedral']
