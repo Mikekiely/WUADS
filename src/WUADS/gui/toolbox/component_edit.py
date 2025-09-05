@@ -12,20 +12,26 @@ class component_edit(QDialog):
                       "nacelle": ["Length", "Diameter", "w_engine"]}
 
     tool_tips = {
-        "Span": "Tip to tip span (ft)",
-        "Area": "Total planform area (ft^2)",
-        "Taper": "Taper ratio, tip chord/root chord",
-        "Sweep": "Quarter chord sweep angle (deg)",
-        "Sweep_location": "Location of the sweep angle as a percentage of the chord",
-        "Dihedral": "Dihedral angle (deg)",
-        "Length": "Component total length (ft)",
-        "Width": "Component width in the y direction at thickest point (Ft)",
-        "Height": "Component height in the z direction at thickest point (Ft)",
-        "Diameter": "Component diameter at thickest point (Ft)",
-        "Xle": "X value at component leading edge (ft)",
-        "Yle": "Y value at component leading edge (ft)",
-        "Zle": "Z value at component leading edge (ft)",
+        "span": "Tip to tip span (ft)",
+        "area": "Total planform area (ft^2)",
+        "taper": "Taper ratio, tip chord/root chord",
+        "sweep": "Quarter chord sweep angle (deg)",
+        "sweep_location": "Location of the sweep angle as a percentage of the chord",
+        "dihedral": "Dihedral angle (deg)",
+        "length": "Component total length (ft)",
+        "width": "Component width in the y direction at thickest point (Ft)",
+        "height": "Component height in the z direction at thickest point (Ft)",
+        "diameter": "Component diameter at thickest point (Ft)",
+        "xle": "X value at component leading edge (ft)",
+        "yle": "Y value at component leading edge (ft)",
+        "zle": "Z value at component leading edge (ft)",
         "w_engine": "Engine Weight (lbs)"
+    }
+
+    variable_labels = {
+        "taper": "Taper ratio",
+        "ct": "Tip Chord",
+        "cr": "Root Chord"
     }
 
     common_parameters = ['Xle', 'Yle', 'Zle']
@@ -33,6 +39,7 @@ class component_edit(QDialog):
         param.extend(common_parameters)
     component_changed = Signal(str)
     title_changed = Signal(str, str)
+    custom_component = False
 
     def __init__(self, component, parent, new_component=False):
         # Set Variables, itialize
@@ -80,8 +87,19 @@ class component_edit(QDialog):
         self.input_fields = {}
         self.multi_fields = {}
         self.multi_field_values = {}
-        for item in self.component_info[component_type]:
 
+        if new_component:
+            fields = self.input_fields[component]
+        else:
+            fields = aircraft.aero_components[component].params.keys()
+            if component not in self.input_fields.keys():
+                self.custom_component = True
+
+        for item in fields:
+            item = item.lower()
+            print(item)
+            if item == 'title':
+                continue
             # Populate line edits
             try:
                 if new_component:
@@ -109,15 +127,33 @@ class component_edit(QDialog):
                 for le in line_edits:
                     le.textChanged.connect(lambda _, var=item: self.multi_field_changed(item))
 
-                label = QLabel(item)
-                label.setToolTip(self.tool_tips[item])
+
+                if item in self.variable_labels.keys():
+                    label = QLabel(self.variable_labels[item])
+                else:
+                    label = QLabel(item.title())
+
+                try:
+                    label.setToolTip(self.tool_tips[item])
+
+                except KeyError:
+                    pass
                 form.addRow(label, container)
             else:
                 line_edit = QLineEdit()
                 line_edit.setText(str(val))
                 line_edit.textChanged.connect(lambda text, var=item: self.text_changed(var, text))
-                label = QLabel(item)
-                label.setToolTip(self.tool_tips[item])
+
+                if item in self.variable_labels.keys():
+                    label = QLabel(self.variable_labels[item])
+                else:
+                    label = QLabel(item.title())
+
+                try:
+                    label.setToolTip(self.tool_tips[item])
+
+                except KeyError:
+                    pass
                 form.addRow(label, line_edit)
                 self.input_fields[item] = line_edit
 
@@ -206,7 +242,6 @@ class component_edit(QDialog):
         super().accept()
 
     def validate_input(self):
-
         validated = True
         for label, line_edit in self.input_fields.items():
             text = line_edit.text().strip()
