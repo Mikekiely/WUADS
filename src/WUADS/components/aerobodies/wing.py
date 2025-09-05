@@ -9,43 +9,45 @@ class Wing(PhysicalComponent):
 
     Also serves as the superclass for horizontal and vertical stabilizer.
     """
-    # Defualt Values
-    sweep = 0           # c/4 sweep (rad)
-    sweep_location = .25    # location of the sweep definition (as a percentage of the chord)
-    sweep_deg = 0       # c/4 sweep (Deg)
-    sweep_le = 0        # Leading edge sweep (rad)
-    sweep_mid = 0       # c/2 sweep (rad)
-    sweep_te = 0        # Trailing edge sweep (rad)
-    sweep_quarter_chord = None
-    area = 0            # Planform surface area (ft^2)
-    aero_body = True
-    span = 0            # Wingspan (ft)
-    cref = 0            # Mean Aerodynamic Chord (ft)
-    airfoil = ''
-    aspect_ratio = 0    # Aspect Ratio
-    taper = 0           # Taper Ratio
-    cr = 0              # Root Chord
-    ct = 0              # Tip Chord
-    Q = 1               # interference factor
-    laminar_percent = .1    # Percentage of laminar flow
-    dihedral = 0        # Dihedral angle (rad)
-    dihedral_deg = 0    # Dihedral angle (deg)
-    tc = .12            # Airfoil Thickness (At Root)
-    hc = .008           # Camber
-    weight_averages = [.8, .2, 0]  # [Raymer, Torenbeek, NASA]
-    # weight_averages = [.15, .85, 0]
-    control_surface_ratio = .1
-    cd0 = 0
-    laminar_percent = .05
-    winglet = {}
-    xc = .35    # x value at mean camber line
-    avl_sections = []
 
     def __init__(self, params):
         """
         Initializes the wing with given parameters
         :param dict params: <dict> list of parameters to edit
         """
+
+        # Defualt Values
+        self.sweep = 0           # c/4 sweep (rad)
+        self.sweep_location = .25    # location of the sweep definition (as a percentage of the chord)
+        self.sweep_deg = 0       # c/4 sweep (Deg)
+        self.sweep_le = 0        # Leading edge sweep (rad)
+        self.sweep_mid = 0       # c/2 sweep (rad)
+        self.sweep_te = 0        # Trailing edge sweep (rad)
+        self.sweep_quarter_chord = None
+        self.area = 0            # Planform surface area (ft^2)
+        self.aero_body = True
+        self.span = 0            # Wingspan (ft)
+        self.cref = 0            # Mean Aerodynamic Chord (ft)
+        self.airfoil = ''
+        self.aspect_ratio = 0    # Aspect Ratio
+        self.taper = 0           # Taper Ratio
+        self.cr = 0              # Root Chord
+        self.ct = 0              # Tip Chord
+        self.Q = 1               # interference factor
+        self.laminar_percent = .1    # Percentage of laminar flow
+        self.dihedral = 0        # Dihedral angle (rad)
+        self.dihedral_deg = 0    # Dihedral angle (deg)
+        self.tc = .12            # Airfoil Thickness (At Root)
+        self.hc = .008           # Camber
+        self.weight_averages = [.8, .2, 0]  # [Raymer, Torenbeek, NASA]
+        # self.weight_averages = [.15, .85, 0]
+        self.control_surface_ratio = .1
+        self.cd0 = 0
+        self.laminar_percent = .05
+        self.winglet = {}
+        self.xc = .35    # x value at mean camber line
+        self.avl_sections = []
+
         super().__init__(params)
 
         # Check if wing is well-defined
@@ -238,7 +240,7 @@ class Wing(PhysicalComponent):
 
         super().set_cg()
 
-    def update(self, variable, value, kwargs):
+    def update(self, variable, value, **kwargs):
         """
         Updates the wing parameters. Note the whole aircraft will need to be re-evaulated to determine weights and drag
 

@@ -10,35 +10,35 @@ class Engine(PhysicalComponent):
     Calculates drag contribution from nacelle
     """
 
-    # Default Values
-    aero_body = False
-    length = 0          # Nacelle Length (ft)
-    diameter = 0        # Nacelle Diameter (ft)
-    ln = 4              # inlet to compressor face
-    p2 = 30             # max static pressure at compressor face (15-50 psi)
-    Wec = 3200          # Weight of
-    Q = 1.3             # interference factor
-    laminar_percent = .05
-    pylon_mounted = True
-    thrust_reversal = False
-    weight_averages = [1, 0, 0]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
-
-    _n_engines = 2  # Number of engines
-    w_engine = 0    # Weight of each engine
-    engine_type = 'turbofan'        # 'Turbofan' or 'Propeller'
-
-    weight_nacelle = 0
-    weight_controls = 0
-    weight_starter = 0
-    weight_fuel_system = 0
-
-
     def __init__(self, params):
-        """
-                Initialize nacelle component and set input parameters.
 
-                params: <dict> list of parameters to edit
-                """
+        """
+            Initialize nacelle component and set input parameters.
+
+            params: <dict> list of parameters to edit
+        """
+
+        # Default Values
+        self.aero_body = False
+        self.length = 0          # Nacelle Length (ft)
+        self.diameter = 0        # Nacelle Diameter (ft)
+        self.ln = 4              # inlet to compressor face
+        self.p2 = 30             # max static pressure at compressor face (15-50 psi)
+        self.Wec = 3200          # Weight of
+        self.Q = 1.3             # interference factor
+        self.laminar_percent = .05
+        self.pylon_mounted = True
+        self.thrust_reversal = False
+
+        self._n_engines = 2  # Number of engines
+        self.w_engine = 0    # Weight of each engine
+        self.engine_type = 'turbofan'        # 'Turbofan' or 'Propeller'
+
+        self.weight_nacelle = 0
+        self.weight_controls = 0
+        self.weight_starter = 0
+        self.weight_fuel_system = 0
+
         super().__init__(params)
         # Find wetted surface area
         self.s_wet = np.pi * self.diameter * self.length

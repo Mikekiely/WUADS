@@ -8,28 +8,29 @@ class Fuselage(PhysicalComponent):
     Used for ellipse shaped main fuselages.
     """
 
-    # Default Values
-    length = 0          # Length Tip to Nose (ft)
-    width = 0           # Width (ft)
-    height = 0          # Height (ft)
-    a_max = 0           # Cross-sectional area at thickest point (ft^2)
-    diameter = 0        # Average Diameter (Ft)
-    fineness_ratio = 0  # Form Factor
-    s_wet = 0
-
-
-    Q = 1.1             # Interference Factor - Landing gear and wing correction
-    laminar_percent = .05  # Laminar flow percentage
-    fuse_mounted_lg = True  # Whether the landing gear is mounted
-
-    weight_averages = [.5, 0, .5]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
-
     def __init__(self, params):
         """
         Initializes fuselage with given parameters.
 
         :param <dict> params: list of parameters to edit
         """
+        # Default Values
+        self.length = 0          # Length Tip to Nose (ft)
+        self.width = 0           # Width (ft)
+        self.height = 0          # Height (ft)
+        self.a_max = 0           # Cross-sectional area at thickest point (ft^2)
+        self.diameter = 0        # Average Diameter (Ft)
+        self.fineness_ratio = 0  # Form Factor
+        self.s_wet = 0
+
+
+        self.Q = 1.1             # Interference Factor - Landing gear and wing correction
+        self.laminar_percent = .05  # Laminar flow percentage
+        self.fuse_mounted_lg = True  # Whether the landing gear is mounted
+
+        self.weight_averages = [.5, 0, .5]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
+
+
         super().__init__(params)
 
         # Calculate class variables

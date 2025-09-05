@@ -5,15 +5,17 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Wing_advanced(Wing):
-    params = {}
-    definition_type = "Sections"
-    avl_sections = []
-    twist = []
-    airfoil = []
-    component_type = 'Wing_Advanced'
-    sections = []
+
 
     def __init__(self, params):
+
+        self.params = {}
+        self.definition_type = "Sections"
+        self.avl_sections = []
+        self.twist = []
+        self.airfoil = []
+        self.component_type = 'Wing_Advanced'
+        self.sections = []
         self.params = params
         self.component_type = self.__class__.__name__
         for variable_name, variable_value in params.items():

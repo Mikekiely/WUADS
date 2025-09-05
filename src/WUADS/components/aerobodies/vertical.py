@@ -8,13 +8,14 @@ class Vertical(Wing):
 
     Subclass of wing, has all the same variables.
     """
-    weight_averages = [.2, .4, .4] # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
+
     def __init__(self, params):
         """
         Initialize vertical stabilizer with input parameters.
 
         params: <dict> list of parameters to edit
         """
+        self.weight_averages = [.2, .4, .4]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
         super().__init__(params)
 
         # Set sections for AVL and other class parameters

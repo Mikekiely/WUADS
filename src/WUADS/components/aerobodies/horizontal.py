@@ -7,8 +7,6 @@ class Horizontal(Wing):
     Class containing all methods and parameters related to Horizontal stabilizers.
     Subclass of wing, has all the same variables.
     """
-    weight_averages = [.2, .4, .4]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
-    control_surface_ratio = .2
 
     def __init__(self, params):
         """
@@ -16,6 +14,9 @@ class Horizontal(Wing):
 
         params: <dict> list of parameters to edit
         """
+
+        self.weight_averages = [.2, .4, .4]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
+        self.control_surface_ratio = .2
         super().__init__(params)
         self.Q = 1.1
 
