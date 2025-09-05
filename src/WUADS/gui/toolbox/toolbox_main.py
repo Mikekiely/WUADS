@@ -69,8 +69,9 @@ class ToolBox(QToolBox):
 
         # Component list - double click to bring up popup to edit component
         self.component_list = QListWidget()
-        for comp in parent.aircraft.aero_components.values():
-            self.component_list.addItem(comp.title)
+
+        self.populate_component_list()
+
         self.addItem(self.component_list, "Components")
         self.component_list.itemDoubleClicked.connect(self.handleComponentDoubleClicked)
         self.component_list.itemClicked.connect(self.handleComponentClicked)
@@ -250,6 +251,15 @@ class ToolBox(QToolBox):
         pop.component_changed.connect(self.component_changed)
         pop.title_changed.connect(self.handle_title_changed)
         pop.exec()
+        # Add the component to the component list
+        self.populate_component_list()
+
+    def populate_component_list(self):
+        self.component_list.clear()
+        for comp in self.aircraft.aero_components.values():
+            print(comp)
+            self.component_list.addItem(comp.title)
+
 
     def handleRemoveComponent(self, item):
         component = item.text()
