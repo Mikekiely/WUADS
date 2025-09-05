@@ -52,8 +52,6 @@ class MainWindow(QMainWindow):
             # rebuild
             layout = QHBoxLayout()
 
-            from toolbox import ToolBox  # make sure this is your toolbox
-            from graphics import graphics  # and your graphics
 
             self.toolbox = ToolBox(self)
             layout.addWidget(self.toolbox, 1)
@@ -73,9 +71,6 @@ class MainWindow(QMainWindow):
             container.setLayout(layout)
             self.setCentralWidget(container)
 
-            print("✅ New toolbox:", id(self.toolbox))
-            print("✅ New graphics:", id(self.graphics))
-
         def load_config(self, *args):
             """Reload configuration + rebuild UI"""
             file_dialog = QFileDialog(self)
@@ -83,7 +78,6 @@ class MainWindow(QMainWindow):
             if file_dialog.exec():
                 config_file = file_dialog.selectedFiles()
                 if config_file:
-                    from aircraft import Aircraft
                     self.aircraft = Aircraft(str(config_file[0]))
                     self.initiate_window()
 
