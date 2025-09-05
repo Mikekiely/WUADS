@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QLineEdit, QLabel, QDialogButtonBox, QWidget, QDialog, QVBoxLayout, QComboBox, \
-    QFormLayout, QHBoxLayout
+    QFormLayout, QHBoxLayout, QPushButton
 from PySide6.QtCore import Signal
 
 class component_edit(QDialog):
@@ -34,6 +34,26 @@ class component_edit(QDialog):
         "cr": "Root Chord"
     }
 
+    variable_types = {
+        "span": float,
+        "area": float,
+        "taper": float,
+        "sweep": float,
+        "sweep_location": float,
+        "dihedral": float,
+        "length": float,
+        "width": float,
+        "height": float,
+        "diameter": float,
+        "xle": float,
+        "yle": float,
+        "zle": float,
+        "w_engine": float,
+        "title": str,
+        "component_type": str,
+        "attachment": str
+    }
+
     common_parameters = ['Xle', 'Yle', 'Zle']
     for comp, param in component_info.items():
         param.extend(common_parameters)
@@ -48,11 +68,16 @@ class component_edit(QDialog):
         self.component = component
         self.title = component
         self.changed_variables = {}
-        super().__init__(parent)
-        self.setWindowTitle("Component Edit")
         aircraft = parent.parent.aircraft
         self.aircraft = aircraft
-        if new_component:
+        super().__init__(parent)
+        self.init_ui(component)
+
+    def init_ui(self, component):
+        self.setWindowTitle("Component Edit")
+        aircraft = self.aircraft
+
+        if self.new_component:
             component_type = component.lower()
         else:
             component_type = aircraft.aero_components[component].component_type.lower()
@@ -70,7 +95,7 @@ class component_edit(QDialog):
         # Title Edit
         self.layout.addWidget(QLabel('Title'))
         title_edit = QLineEdit()
-        if not new_component:
+        if not self.new_component:
             title_edit.setText(str(component.capitalize()))
         title_edit.textChanged.connect(self.handle_title_changed)
         if component.lower() == 'main wing':
@@ -87,8 +112,9 @@ class component_edit(QDialog):
         self.input_fields = {}
         self.multi_fields = {}
         self.multi_field_values = {}
+        self.sub_dicts = {}
 
-        if new_component:
+        if self.new_component:
             fields = self.component_info[component]
         else:
             fields = aircraft.aero_components[component].params.keys()
@@ -101,10 +127,10 @@ class component_edit(QDialog):
                 continue
             # Get Value
             try:
-                if new_component:
+                if self.new_component:
                     val = ''
                 else:
-                    val = getattr(aircraft.aero_components[component], item.lower())
+                    val = aircraft.aero_components[component].params[item]
                     if item == 'sweep' or item.startswith('dihedral'):
                         val *= 180 / 3.14159
                         val = round(val, 2)
@@ -122,7 +148,31 @@ class component_edit(QDialog):
             except KeyError:
                 pass
 
-            if isinstance(val, list):
+            # Add rows
+            # Wing sections edit
+            if item == "sections" and isinstance(val, list):
+                # List of dicts
+                container = QWidget()
+                layout = QVBoxLayout(container)
+                layout.setContentsMargins(0, 0, 0, 0)
+                self.sub_dicts[item] = val
+                self.section_labels = []
+
+                for idx, section in enumerate(val):
+                    row = QWidget()
+                    row_layout = QHBoxLayout(row)
+                    row_layout.setContentsMargins(0, 0, 0, 0)
+
+                    edit_btn = QPushButton(f"Edit Section {idx + 1}")
+                    edit_btn.clicked.connect(lambda _, i=idx: self.edit_section_dialog(i))
+
+                    row_layout.addWidget(edit_btn)
+                    layout.addWidget(edit_btn)
+
+                    # self.section_labels.append(summary)
+                form.addRow(label, container)
+
+            elif isinstance(val, list):
                 container = QWidget()
                 layout = QHBoxLayout(container)
                 layout.setContentsMargins(0, 0, 0, 0)
@@ -233,15 +283,14 @@ class component_edit(QDialog):
             text = line_edit.text().strip()
             if not text:
                 line_edit.setStyleSheet("border: 1px solid red;")
-            try:
-                if label == 'title' or label == 'component_type' or label == 'attachment' or label == 'definition_type':
-                    str(text)
-                else:
-                    float(text)
-                line_edit.setStyleSheet("")
-            except ValueError:
-                line_edit.setStyleSheet("border: 1px solid red;")
-                validated = False
+
+            if label in self.variable_types.keys():
+                try:
+                    self.variable_types[label](text)
+                    line_edit.setStyleSheet("")
+                except ValueError:
+                    line_edit.setStyleSheet("border: 1px solid red;")
+                    validated = False
 
         if 'title' in self.changed_variables and self.new_component:
 
@@ -250,3 +299,52 @@ class component_edit(QDialog):
                 validated = False
 
         return validated
+
+    def edit_section_dialog(self, idx):
+        wing = self.aircraft.aero_components[self.component]
+        section = wing.sections[idx]
+        dlg = QDialog(self)
+        dlg.setWindowTitle(f"Edit Section {idx+1}")
+        layout = QVBoxLayout(dlg)
+        form = QFormLayout()
+        edits = {}
+        params = section.params
+
+        changed_fields = set()
+
+        def section_text_changed(text):
+            changed_fields.add(text)
+
+        for key, val in params.items():
+            le = QLineEdit(str(val))
+            form.addRow(QLabel(key.title()), le)
+            le.textChanged.connect(lambda text, k=key: section_text_changed(k))
+            edits[key] = le
+
+        layout.addLayout(form)
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        layout.addWidget(buttons)
+        buttons.accepted.connect(dlg.accept)
+        buttons.rejected.connect(dlg.reject)
+
+        if dlg.exec_():
+            args = []
+            for k in changed_fields:
+                val = edits[k].text()
+                try:
+                    v = float(val)
+                except ValueError:
+                    val = le.text()
+
+                args.append((self.component, k, val))
+
+            if args:
+                print(idx)
+                self.aircraft.update_component(args, section=idx)
+                self.component_changed.emit(self.component)
+
+
+
+            # Refresh the whole form/dialog so everything is consistent
+            self.component_changed.emit(self.component)  # assumes form-building is in a separate method
+
