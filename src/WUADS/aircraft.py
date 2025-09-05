@@ -45,44 +45,7 @@ class Aircraft:
     -   Config File: YAML file containing relevant component information for aircraft, see online tutorials for more information
     """
 
-    # Default Values
 
-    title = ''
-    aero_components = {}
-    cruise_conditions = {}  # Flight conditions at cruise
-    sref = 0  # Reference Area (ft^2)
-    cd0 = 0  # Parasite Drag coefficient
-    cdw = 0  # Wave drag coefficient
-
-    misc_components = {}  # Miscellaneous Components
-
-    cg = [0, 0, 0]
-    cg_empty = [0, 0, 0]
-    inertia = [0, 0, 0]
-    _n_engines = 2
-
-    _lock_component_weights = False  # Locks component weights so editing the aircraft doesn't change them
-    _h_cruise = 0  # Cruise Altitude
-    _m_cruise = 0  # Cruise Mach number
-
-    weight_takeoff = 0  # Takeoff Gross Weight (lbs)
-    weight_empty = 0  # Empty weight, no fuel, no cargo, no crew
-    weight_max = 0  # Max Takeoff weight
-    weight_reference = 0  # Reference weight used to calculate component weights, typically the same as weight_max
-
-    _w_cargo = 0  # Cargo weight
-    _w_fuel = 0  # Fuel Weight
-    _n_z = 0  # Ultimate load
-
-    subsystems = []
-    useful_load = None
-    mission = None
-    stability = None
-    propulsion = None
-    aircraft_type = 'transport'
-
-    _output_dir = None
-    _file_prefix = None
 
     def __init__(self, config_file, wdg_guess=100000):
         """
@@ -92,6 +55,45 @@ class Aircraft:
         Parameters:
             config_file: aircraft input file in yaml format, see tutorials for further explanation
         """
+
+        # Default Values
+
+        self.title = ''
+        self.aero_components = {}
+        self.cruise_conditions = {}  # Flight conditions at cruise
+        self.sref = 0  # Reference Area (ft^2)
+        self.cd0 = 0  # Parasite Drag coefficient
+        self.cdw = 0  # Wave drag coefficient
+
+        self.misc_components = {}  # Miscellaneous Components
+
+        self.cg = [0, 0, 0]
+        self.cg_empty = [0, 0, 0]
+        self.inertia = [0, 0, 0]
+        self._n_engines = 2
+
+        self._lock_component_weights = False  # Locks component weights so editing the aircraft doesn't change them
+        self._h_cruise = 0  # Cruise Altitude
+        self._m_cruise = 0  # Cruise Mach number
+
+        self.weight_takeoff = 0  # Takeoff Gross Weight (lbs)
+        self.weight_empty = 0  # Empty weight, no fuel, no cargo, no crew
+        self.weight_max = 0  # Max Takeoff weight
+        self.weight_reference = 0  # Reference weight used to calculate component weights, typically the same as weight_max
+
+        self._w_cargo = 0  # Cargo weight
+        self._w_fuel = 0  # Fuel Weight
+        self._n_z = 0  # Ultimate load
+
+        self.subsystems = []
+        self.useful_load = None
+        self.mission = None
+        self.stability = None
+        self.propulsion = None
+        self.aircraft_type = 'transport'
+
+        self._output_dir = None
+        self._file_prefix = None
 
         self.input_file = config_file
         self.load_config()

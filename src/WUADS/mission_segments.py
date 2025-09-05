@@ -10,35 +10,36 @@ class MissionSegment:
     """
     Base class for all mission_rae2822 segments.
     """
-    segment_type = ''
-    range = 0
-    altitude = 0
-    mach = 0
-    thrust = 0
-    sfc = 0
-    velocity = 0
-    cl = 0
-    cd = 0
-    cd0 = 0
-    cdw = 0
 
-    fuel_burnt = 0
-    weight_fraction = 0
-    time = 0
-    lift_to_drag = 0
-    find_range = False
-    run_sim = False
-    flight_conditions = []
-
-    wi = 0
-    wn = 0
-
-    power_required = 0
-    power_required_kw = 0
-    input_params = []
 
 
     def __init__(self):
+        self.segment_type = ''
+        self.range = 0
+        self.altitude = 0
+        self.mach = 0
+        self.thrust = 0
+        self.sfc = 0
+        self.velocity = 0
+        self.cl = 0
+        self.cd = 0
+        self.cd0 = 0
+        self.cdw = 0
+
+        self.fuel_burnt = 0
+        self.weight_fraction = 0
+        self.time = 0
+        self.lift_to_drag = 0
+        self.find_range = False
+        self.run_sim = False
+        self.flight_conditions = []
+
+        self.wi = 0
+        self.wn = 0
+
+        self.power_required = 0
+        self.power_required_kw = 0
+        self.input_params = []
         pass
 
     def breguet_range(self, aircraft, wi):
@@ -46,12 +47,14 @@ class MissionSegment:
 
 
 class takeoff(MissionSegment):
-    thrust_setting = 100
+
     input_params = ['thrust_setting', 'time', 'title']
 
     def __init__(self, thrust_setting=100, time=0, title='takeoff', **kwargs):
-        self.title = title
+
         super().__init__()
+        self.thrust_setting = 100
+        self.title = title
         self.time = time * 60
         self.thrust_setting = thrust_setting
         self.segment_type = 'takeoff'
@@ -73,20 +76,21 @@ class takeoff(MissionSegment):
         self.wn = wi * self.weight_fraction
 
 class climb(MissionSegment):
-    start_velocity = 0
-    end_velocity = 0
-    start_altitude = 0
-    end_altitude = 0
-    divisions = 1
-    best_climb = False
-    power_available = 0
-    rate_of_climb = 0
-    max_thrust = 0
-    K = 0
     input_params = ['start_velocity', 'end_velocity', 'start_altitude', 'end_altitude', 'title']
 
     def __init__(self, title='climb', start_velocity=0, end_velocity=0, start_altitude=0, end_altitude=0, **kwargs):
         super().__init__()
+
+        self.start_velocity = 0
+        self.end_velocity = 0
+        self.start_altitude = 0
+        self.end_altitude = 0
+        self.divisions = 1
+        self.best_climb = False
+        self.power_available = 0
+        self.rate_of_climb = 0
+        self.max_thrust = 0
+        self.K = 0
         self.title = title
         self.__dict__.update(kwargs)
         self.start_velocity = start_velocity
@@ -165,13 +169,14 @@ class climb(MissionSegment):
 
 
 class cruise(MissionSegment):
-    wn = 0
-    range = None
     input_params = ['mach', 'altitude', 'title', 'find_range', 'range']
 
     def __init__(self, mach=0, altitude=0, title='cruise', find_range=True, range=None, **kwargs):
         self.title = title
         super().__init__()
+
+        self.wn = 0
+        self.range = None
         self.mach = mach
         self.altitude = altitude
         self.find_range = find_range
@@ -360,14 +365,15 @@ class loiter(MissionSegment):
 
 
 class landing(MissionSegment):
-    reserve_fuel = 0
-    wf_reserve = 0
-    w_landing = 0
     input_params = ['title', 'weight_fraction', 'reserve_fuel']
 
     def __init__(self, title='landing', weight_fraction=1, reserve_fuel=0, **kwargs):
         self.title = title
         super().__init__()
+
+        self.reserve_fuel = 0
+        self.wf_reserve = 0
+        self.w_landing = 0
         self.weight_fraction = weight_fraction
         self.wf_reserve = reserve_fuel
         self.segment_type = 'landing'
@@ -390,12 +396,13 @@ class landing(MissionSegment):
 
 class weight_drop(MissionSegment):
     # Instantaneous weight drop
-    weight_dropped = 0
+
     input_params = ['title', 'weight_dropped']
 
     def __init__(self, title='weight_drop', weight_dropped=0, **kwargs):
         self.title = title
         super().__init__()
+        self.weight_dropped = 0
         self.weight_dropped = weight_dropped
         self.segment_type = 'weight_drop'
 

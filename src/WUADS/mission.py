@@ -17,23 +17,24 @@ class Mission:
     """
     Class which contains information to the mission requirements and profile of an aircraft
     """
-    # Default values
-    w_fuel = 0
-    n_passengers = 0
-    n_pilots = 0
-    n_flight_attendants = 0
-    mach = 0
-    max_mach = 0
-    altitude = 0
-    design_range = 0
-    range = 0
-
-    rho_fuel = 6.8
-    ultimate_load = 0
-
-    mission_profile = []
 
     def __init__(self, aircraft):
+
+        # Default values
+        self.w_fuel = 0
+        self.n_passengers = 0
+        self.n_pilots = 0
+        self.n_flight_attendants = 0
+        self.mach = 0
+        self.max_mach = 0
+        self.altitude = 0
+        self.design_range = 0
+        self.range = 0
+
+        self.rho_fuel = 6.8
+        self.ultimate_load = 0
+
+        self.mission_profile = []
 
         self.aircraft = aircraft
         self.max_mach = self.mach * 1.025

@@ -10,12 +10,6 @@ class engine:
     """
     Contains all analyses and variables required to analyze propulsion performance
     """
-    engine_type = ''
-    altitude_ref = []  # Altitudes used for the sfc and thrust tables
-    mach_ref = []  # Mach number used for the sfc and thrust tables
-    thrust_input = []  # Input values for thrust
-    sfc_input = []  # Input values for sfc
-    components = {}
 
     def __init__(self, n_engines=2, max_thrust=0, sfc=0):
         """
@@ -23,6 +17,13 @@ class engine:
 
         :param int n_engines: Number of engines
         """
+
+        self.engine_type = ''
+        self.altitude_ref = []  # Altitudes used for the sfc and thrust tables
+        self.mach_ref = []  # Mach number used for the sfc and thrust tables
+        self.thrust_input = []  # Input values for thrust
+        self.sfc_input = []  # Input values for sfc
+        self.components = {}
         self.n_engines = n_engines  # Number of engines
         self.max_thrust = max_thrust
         self.sfc = sfc
@@ -37,33 +38,6 @@ class turbofan(engine):
 
     Scales results based off the values for the cfm56_7b24 (737-800's engine)
     """
-
-    # Values used to scale the standard performance data
-    thrust_sea_level = None
-    thrust_cruise = None
-    sfc_sea_level = None
-    sfc_cruise = None
-    engine_type = None
-    engine_data_file = None
-
-    engine_type = 'turbofan'
-    # Basic cfm56-7b values
-    thrust_input = [[24200, 21016, 19105, 17004, 15284, 13819, 12418, 10508, 8152, 5413],
-                    [16004, 14597, 13954, 12293, 11335, 10505, 9932, 9165, 8271, 7185],
-                    [9788, 9074, 8425, 7842, 7326, 6909, 6685, 6426, 6153, 5585],
-                    [8155, 7522, 6915, 6459, 6165, 6002, 5937, 5741, 5480, 5121],
-                    [6214, 5750, 5320, 4988, 4757, 4625, 4515, 4363, 4178, 3932],
-                    [4054, 3516, 3113, 2819, 2605, 2443, 2305, 2162, 1987, 1752]]
-
-    sfc_input = [[0.370, 0.416, 0.474, 0.503, 0.624, 0.694, 0.786, 0.948, 1.214, 1.769],
-                 [0.362, 0.382, 0.413, 0.467, 0.527, 0.592, 0.674, 0.760, 0.869, 1.046],
-                 [0.294, 0.333, 0.367, 0.408, 0.449, 0.505, 0.541, 0.615, 0.670, 0.769],
-                 [0.291, 0.324, 0.353, 0.390, 0.425, 0.462, 0.509, 0.564, 0.627, 0.703],
-                 [0.273, 0.333, 0.359, 0.383, 0.419, 0.466, 0.498, 0.563, 0.614, 0.661],
-                 [0.224, 0.260, 0.296, 0.331, 0.367, 0.406, 0.448, 0.495, 0.548, 0.609]]
-
-    mach_ref = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9]
-    altitude_ref = [0, 15000, 31000, 35000, 41000, 50000]
 
     def __init__(self, h_cruise, mach_cruise, n_engines=2, thrust_sea_level=None,
                  sfc_sea_level=None, thrust_cruise=None, sfc_cruise=None, engine_data_file=None):
@@ -80,6 +54,34 @@ class turbofan(engine):
         :param float sfc_cruise: specific fuel consuption at cruise, 1/hrs
         """
         super().__init__(n_engines)
+
+        # Values used to scale the standard performance data
+        self.thrust_sea_level = None
+        self.thrust_cruise = None
+        self.sfc_sea_level = None
+        self.sfc_cruise = None
+        self.engine_type = None
+        self.engine_data_file = None
+
+        self.engine_type = 'turbofan'
+        # Basic cfm56-7b values
+        self.thrust_input = [[24200, 21016, 19105, 17004, 15284, 13819, 12418, 10508, 8152, 5413],
+                        [16004, 14597, 13954, 12293, 11335, 10505, 9932, 9165, 8271, 7185],
+                        [9788, 9074, 8425, 7842, 7326, 6909, 6685, 6426, 6153, 5585],
+                        [8155, 7522, 6915, 6459, 6165, 6002, 5937, 5741, 5480, 5121],
+                        [6214, 5750, 5320, 4988, 4757, 4625, 4515, 4363, 4178, 3932],
+                        [4054, 3516, 3113, 2819, 2605, 2443, 2305, 2162, 1987, 1752]]
+
+        self.sfc_input = [[0.370, 0.416, 0.474, 0.503, 0.624, 0.694, 0.786, 0.948, 1.214, 1.769],
+                     [0.362, 0.382, 0.413, 0.467, 0.527, 0.592, 0.674, 0.760, 0.869, 1.046],
+                     [0.294, 0.333, 0.367, 0.408, 0.449, 0.505, 0.541, 0.615, 0.670, 0.769],
+                     [0.291, 0.324, 0.353, 0.390, 0.425, 0.462, 0.509, 0.564, 0.627, 0.703],
+                     [0.273, 0.333, 0.359, 0.383, 0.419, 0.466, 0.498, 0.563, 0.614, 0.661],
+                     [0.224, 0.260, 0.296, 0.331, 0.367, 0.406, 0.448, 0.495, 0.548, 0.609]]
+
+        self.mach_ref = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9]
+        self.altitude_ref = [0, 15000, 31000, 35000, 41000, 50000]
+
         if engine_data_file:
             self.engine_data_file = engine_data_file
             self.load_data_file(engine_data_file)
