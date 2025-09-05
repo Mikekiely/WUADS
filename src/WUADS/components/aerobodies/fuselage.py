@@ -218,7 +218,7 @@ class Fuselage(PhysicalComponent):
         self.cg = [self.length * .45 + self.xle, 0, 0]
         super().set_cg()
 
-    def update(self, variable, value, maintain_aspect_ratio=True):
+    def update(self, variable, value):
         """
         Allows for modifying a specific fuselage property (such as `width` or `height`)
         and recalculates derived attributes like `diameter` based on the updated value.
@@ -227,5 +227,5 @@ class Fuselage(PhysicalComponent):
         :param float value: The new value to set for the specified property.
         :param maintain_aspect_ratio: Indicates whether to maintain the aspect ratio between `width` and `height`.
         """
-        super().update(variable, value, maintain_aspect_ratio)
+        super().update(variable, value)
         self.diameter = .5 * (self.width + self.height)

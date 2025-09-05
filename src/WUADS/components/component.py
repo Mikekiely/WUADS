@@ -36,7 +36,7 @@ class Component:
             if hasattr(self, variable_name.lower()):
                 setattr(self, variable_name.lower(), variable_value)
 
-    def update(self, variable, value, maintain_aspect_ratio=True):
+    def update(self, variable, value, **kwargs):
         """
         Updates specified parameters in component.
         Note the whole aircraft will need to be re-evaluated to determine weights and drag.
