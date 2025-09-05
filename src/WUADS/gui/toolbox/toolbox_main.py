@@ -257,7 +257,6 @@ class ToolBox(QToolBox):
     def populate_component_list(self):
         self.component_list.clear()
         for comp in self.aircraft.aero_components.values():
-            print(comp)
             self.component_list.addItem(comp.title)
 
 
