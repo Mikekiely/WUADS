@@ -23,7 +23,8 @@ class Wing_advanced(Wing):
         self.sections = []
         first_section = True
 
-        for section_name, section_params in self.params['sections'].items():
+        i = 1
+        for section_params in self.params['sections']:
             if first_section:
                 section_params["xle"] = self.xle
                 section_params["yle"] = self.yle
@@ -36,7 +37,8 @@ class Wing_advanced(Wing):
                 section_params["cr"] = self.sections[-1].ct
 
             section = wing_section(section_params)
-            section.title = section_name
+            section.title = f'section__{i}'
+            i += 1
             self.sections.append(section)
 
         # set variables
