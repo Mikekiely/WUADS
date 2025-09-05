@@ -1,5 +1,8 @@
 from .wing import Wing
 import numpy as np
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Wing_advanced(Wing):
     params = {}
@@ -93,12 +96,20 @@ class Wing_advanced(Wing):
             i += 1
         self.avl_sections.append([self.sections[-1].xle_tip, self.sections[-1].yle_tip, self.sections[-1].zle_tip, self.ct, self.twist[-1]])
 
-
     def set_variables(self):
         # Set variables
         for variable_name, variable_value in self.params.items():
             if hasattr(self, variable_name.lower()) and variable_name.lower() != 'sections':
                 setattr(self, variable_name.lower(), variable_value)
+
+    def update(self, variable, value, kwargs):
+        section = kwargs.get('section', None)
+        if section is None:
+            logger.error(f'Please specify which section to update')
+        print(section)
+        sec = self.params['sections'][section]
+        print(sec)
+
 
 
 
