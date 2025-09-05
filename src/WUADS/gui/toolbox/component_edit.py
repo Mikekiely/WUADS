@@ -89,7 +89,7 @@ class component_edit(QDialog):
         self.multi_field_values = {}
 
         if new_component:
-            fields = self.input_fields[component]
+            fields = self.component_info[component]
         else:
             fields = aircraft.aero_components[component].params.keys()
             if component not in self.input_fields.keys():
@@ -97,7 +97,6 @@ class component_edit(QDialog):
 
         for item in fields:
             item = item.lower()
-            print(item)
             if item == 'title':
                 continue
             # Populate line edits
@@ -106,7 +105,7 @@ class component_edit(QDialog):
                     val = ''
                 else:
                     val = getattr(aircraft.aero_components[component], item.lower())
-                    if item == 'Sweep' or item.startswith('Dihedral'):
+                    if item == 'sweep' or item.startswith('dihedral'):
                         val *= 180 / 3.14159
                         val = round(val, 2)
             except KeyError:
@@ -126,7 +125,6 @@ class component_edit(QDialog):
 
                 for le in line_edits:
                     le.textChanged.connect(lambda _, var=item: self.multi_field_changed(item))
-
 
                 if item in self.variable_labels.keys():
                     label = QLabel(self.variable_labels[item])
