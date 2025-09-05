@@ -39,7 +39,6 @@ class MissionSegment:
 
         self.power_required = 0
         self.power_required_kw = 0
-        self.input_params = []
         pass
 
     def breguet_range(self, aircraft, wi):

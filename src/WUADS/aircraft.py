@@ -409,12 +409,14 @@ class Aircraft:
                              'sfc_sea_level': self.propulsion.sfc_sea_level,
                              'sfc_cruise': self.propulsion.sfc_cruise}
 
+        # TODO Fix this (I think times area writing in the wrong unit)
         mission_profile_params = {}
         for seg in self.mission.mission_profile:
             seg_params = {}
             for item in seg.input_params:
                 seg_params[item] = getattr(seg, item)
-                print(seg_params[item])
+            seg_params['segment_type'] = seg.segment_type
+            del seg_params['title']
             mission_profile_params[seg.title] = seg_params
 
         data = {
