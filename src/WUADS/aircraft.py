@@ -334,7 +334,7 @@ class Aircraft:
             value = var[2]
             # Check if title is in aero components
             if title in self.aero_components:
-                self.aero_components[title].update(variable, value, kwargs)
+                self.aero_components[title].update(variable, value, **kwargs)
 
         # Re-initialize the weights and drag
         self.sref = self.aero_components['Main Wing'].area
