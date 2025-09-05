@@ -102,13 +102,26 @@ class Wing_advanced(Wing):
             if hasattr(self, variable_name.lower()) and variable_name.lower() != 'sections':
                 setattr(self, variable_name.lower(), variable_value)
 
-    def update(self, variable, value, kwargs):
+    def update(self, variable, value, **kwargs):
         section = kwargs.get('section', None)
-        if section is None:
-            logger.error(f'Please specify which section to update')
-        print(section)
-        sec = self.params['sections'][section]
-        print(sec)
+
+        if variable in self.params:
+            self.params[variable] = value
+        else:
+            value = float(value)
+            if variable == 'span':
+                variable = 'length'
+                value = value / 2
+
+            if section is not None:
+                sec = self.params['sections'][int(section)]
+                if variable in sec.keys():
+                    sec[variable] = value
+            else:
+                self.params[variable] = value
+
+        self.__init__(self.params)
+
 
 
 
