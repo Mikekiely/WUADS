@@ -6,23 +6,6 @@ class UsefulLoad:
 
     crew members, passengers, fuel, and cargo
     """
-    weight = 0
-    n_pilots = 0
-    w_pilots = 0
-    cg_pilots = [0, 0, 0]
-    n_flight_attendants = 0
-    w_flight_attendants = 0
-    cg_flight_attendants = [0, 0, 0]
-    n_passengers = 0
-    w_passengers = 0
-    cg_passengers = [0, 0, 0]
-    w_fuel = 0
-    cg_fuel = [0, 0, 0]
-    w_cargo = 0
-    cg_cargo = [0, 0, 0]
-
-    cg = [0, 0, 0]
-    inertia = [0, 0, 0]
 
 
     def __init__(self, params):
@@ -30,6 +13,25 @@ class UsefulLoad:
         Initialize useful load and set all weights, centers of gravity (cg), and moments of inertia
         :param <dict> params: list of parameters to edit.
         """
+
+        self.weight = 0
+        self.n_pilots = 0
+        self.w_pilots = 0
+        self.cg_pilots = [0, 0, 0]
+        self.n_flight_attendants = 0
+        self.w_flight_attendants = 0
+        self.cg_flight_attendants = [0, 0, 0]
+        self.n_passengers = 0
+        self.w_passengers = 0
+        self.cg_passengers = [0, 0, 0]
+        self.w_fuel = 0
+        self.cg_fuel = [0, 0, 0]
+        self.w_cargo = 0
+        self.cg_cargo = [0, 0, 0]
+
+        self.cg = [0, 0, 0]
+        self.inertia = [0, 0, 0]
+
         for variable_name, variable_value in params.items():
             if hasattr(self, variable_name.lower()):
                 setattr(self, variable_name.lower(), variable_value)

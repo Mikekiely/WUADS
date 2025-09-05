@@ -7,15 +7,7 @@ logger = logging.getLogger(__name__)
 
 # Contains component classes for all various subsystems
 class Subsystems:
-    """
-    Contains weight properties for all supported subsystems
-    """
-    weight = 0
-    cg = 0
-    inertia = [0, 0, 0]
 
-    parameters = {}
-    components = {}
 
     def __init__(self, params):
         """
@@ -23,6 +15,15 @@ class Subsystems:
 
         :param <dict> params: list of parameters to edit
         """
+        """
+            Contains weight properties for all supported subsystems
+            """
+        self.weight = 0
+        self.cg = 0
+        self.inertia = [0, 0, 0]
+
+        self.parameters = {}
+        self.components = {}
         self.parameters = params
         for name, cg in params['subsystems'].items():
             self.components[name] = Component({'title': name, 'cg': cg})

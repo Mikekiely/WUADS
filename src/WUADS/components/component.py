@@ -12,16 +12,6 @@ class Component:
     All methods may be overriden by specific component classes
     """
 
-    params = {}  # Input parameters, used to edit the component later
-    title = ""  # Name of component
-    component_type = ""  # Component class type
-
-    weight = 0.0  # Overall weight
-
-    cg = [0, 0, 0]  # Center of gravity (x, y, z)
-    inertia = [0, 0, 0]  # Moments of inertia (ix, iy, iz)
-    aero_body = False
-
     def __init__(self, params):
         """
         Initializes component and sets all input parameters
@@ -29,6 +19,16 @@ class Component:
         Parameters:
         :param <dict> params: list of parameters to edit.
         """
+
+        self.params = {}  # Input parameters, used to edit the component later
+        self.title = ""  # Name of component
+        self.component_type = ""  # Component class type
+
+        self.weight = 0.0  # Overall weight
+
+        self.cg = [0, 0, 0]  # Center of gravity (x, y, z)
+        self.inertia = [0, 0, 0]  # Moments of inertia (ix, iy, iz)
+        self.aero_body = False
 
         self.params = params
         self.component_type = self.__class__.__name__
@@ -78,23 +78,6 @@ class PhysicalComponent(Component):
     """
     Component which effects aerodynamic performance of the aircraft
     """
-    # Default Values
-    avl_sections = []  # Sections to input into AVL
-    attachment = ""  # What component is this attached to, eg. nacelle attached to wing
-    cd0 = 0.0  # Parasite drag coefficient
-    cdw = 0.0  # Wave drag coefficient
-    xle = 0.0  # Leading edge x coordinate
-    yle = 0.0  # Leading edge y coordinate
-    zle = 0.0  # Leading edge z coordinate
-
-    laminar_percent = 0.1  # Percentage experiencing laminar flow
-    Q = 1.0  # Interference factor (for parasite drag)
-    s_wet = 0  # Wetted Surface area
-
-    weight_raymer = 0.0  # Weight using Raymer estimation method
-    weight_torenbeek = 0.0  # Weight using Torenbeek method
-    weight_nasa = 0  # Weight using NASA FLOPS Method
-    weight_averages = [1 / 3, 1 / 3, 1 / 3]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
 
     def __init__(self, params):
         """
@@ -102,6 +85,25 @@ class PhysicalComponent(Component):
 
         :param <dict> params: list of parameters to edit
         """
+
+        # Default Values
+        self.avl_sections = []  # Sections to input into AVL
+        self.attachment = ""  # What component is this attached to, eg. nacelle attached to wing
+        self.cd0 = 0.0  # Parasite drag coefficient
+        self.cdw = 0.0  # Wave drag coefficient
+        self.xle = 0.0  # Leading edge x coordinate
+        self.yle = 0.0  # Leading edge y coordinate
+        self.zle = 0.0  # Leading edge z coordinate
+
+        self.laminar_percent = 0.1  # Percentage experiencing laminar flow
+        self.Q = 1.0  # Interference factor (for parasite drag)
+        self.s_wet = 0  # Wetted Surface area
+
+        self.weight_raymer = 0.0  # Weight using Raymer estimation method
+        self.weight_torenbeek = 0.0  # Weight using Torenbeek method
+        self.weight_nasa = 0  # Weight using NASA FLOPS Method
+        self.weight_averages = [1 / 3, 1 / 3,
+                           1 / 3]  # [Raymer, Torenbeek, NASA] - weighted averages used for weight estimation
         super().__init__(params)
 
     def parasite_drag(self, form_factor, l_char, flight_conditions, sref):
