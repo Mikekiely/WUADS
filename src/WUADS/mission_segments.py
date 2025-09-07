@@ -103,7 +103,12 @@ class climb(MissionSegment):
         self.altitude = .5*(start_altitude + end_altitude)
         fc = FlightConditions(self.altitude, 0)
 
-        self.mach = self.velocity / fc.a
+        fc_start = FlightConditions(self.start_altitude, 0)
+        fc_end = FlightConditions(self.end_altitude, 0)
+        mach_start = self.start_velocity / fc_start.a
+        mach_end = self.end_velocity / fc_end.a
+
+        self.mach = .5 * mach_start + .5 * mach_end
         fc = FlightConditions(self.altitude, self.mach)
         self.flight_conditions = fc
 
@@ -144,7 +149,7 @@ class climb(MissionSegment):
         self.thrust = D
         delta_he = (self.end_altitude + 1 / (2 * g) * self.end_velocity ** 2) - (1 / (2 * g) * self.start_velocity ** 2)
 
-        self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.altitude, self.flight_conditions.mach, self.thrust)
+        self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.altitude, self.flight_conditions.mach)
 
         self.max_thrust = max_thrust
         self.weight_fraction = np.exp(
