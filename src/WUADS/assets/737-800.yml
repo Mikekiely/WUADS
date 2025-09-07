@@ -3,8 +3,8 @@ Units: Imperial       # "SI" or "Imperial"
 aircraft:
   title: 'b737-800'         # Used for output file prefix
   altitude: 35000           # Altitude at cruise
-  mach: 0.8                 # Mach number at cruise
-  max_mach: .82             # Maximum mach number at cruise
+  mach: 0.82                 # Mach number at cruise
+  max_mach: .78           # Maximum mach number at cruise
   ultimate_load: 4.5        # Ultimate Load Factor (g's)
   w_fuel: 46000             # Fuel Weight
   cg_fuel: [65, 0, 0]       # Fuel center of gravity (Optional)
@@ -93,7 +93,7 @@ components:
 
 propulsion:
   engine_type: 'turbofan'   # Turbofan of propeller currently
-  thrust_cruise: 6813
+  sfc_cruise: .545
 
 subsystem_parameters:
   subsystems: # Subsystems and their centers of gravity
@@ -151,26 +151,12 @@ mission_profile:
     end_altitude: 35000
   cruise:
     segment_type: cruise
-    mach: .8
+    mach: .78
     altitude: 35000
     find_range: True
   descent:
     segment_type: descent
     weight_fraction: .995
-  climb_4:
-    run_sim: True
-    segment_type: climb
-    start_velocity: 421.952
-    end_velocity: 421.952
-    start_altitude: 1500
-    end_altitude: 10000
-  climb_5:
-    run_sim: True
-    segment_type: climb
-    start_velocity: 421.952
-    end_velocity: 518.427675
-    start_altitude: 10000
-    end_altitude: 20000
   cruise_diversion:
     segment_type: cruise
     mach: .5003
