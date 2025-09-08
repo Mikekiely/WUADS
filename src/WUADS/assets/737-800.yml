@@ -3,19 +3,19 @@ Units: Imperial       # "SI" or "Imperial"
 aircraft:
   title: 'b737-800'         # Used for output file prefix
   altitude: 35000           # Altitude at cruise
-  mach: 0.82                 # Mach number at cruise
+  mach: 0.78                 # Mach number at cruise
   max_mach: .78           # Maximum mach number at cruise
   ultimate_load: 4.5        # Ultimate Load Factor (g's)
   w_fuel: 46000             # Fuel Weight
-  cg_fuel: [65, 0, 0]       # Fuel center of gravity (Optional)
+  cg_fuel: [68, 0, 0]       # Fuel center of gravity (Optional)
   rho_fuel: 6.8             # Fuel density (lbs/gal) (Optional)
   n_passengers: 180         # number of passengers (Optional)
-  cg_passengers: [58, 0, 0]  # Center of gravity for passengers (Optional)
+  cg_passengers: [60, 0, 0]  # Center of gravity for passengers (Optional)
   n_pilots: 2               # Number of pilots (Optional)
   n_flight_attendants: 4    # Number of flight attendants (Optional)
   cg_crew: [9, 0, 0]        # Center of gravity for the crew (Optional)
   w_cargo: 15757            # Cargo Weight (Optional)
-  cg_cargo: [54, 0, 0]      # Center of gravity for cargo (Optional)
+  cg_cargo: [60, 0, 0]      # Center of gravity for cargo (Optional)
   design_range: 2935        # Design range (nmi)
   n_engines: 2              # number of engines
 
@@ -27,8 +27,9 @@ components:
     span: 111                   # Wing Span
     taper: 0.1581               # Wing Taper Ratio
     sweep: 25.01                # Quarter Chord Sweep (deg)
+    sweep_location: .25
     dihedral: 6                 # Dihedral Angle at root
-    xle: 51.3                   # X value at leading edge
+    xle: 42.4                   # X value at leading edge
     yle: 0                      # Y value at leading edge
     zle: -2.42                  # Z value at leading edge
 
@@ -38,12 +39,13 @@ components:
 
   horizontal:
     title: 'Horizontal Stabilizer'
-    span: 46.8
+    span: 47.1
     cr: 12.8
     ct: 2.55
     sweep: 34.407
+    sweep_location: 0
     dihedral: 7
-    xle: 111.5
+    xle: 111
     yle: 0
     zle: 4.415
     control_surface_ratio: .2
@@ -55,14 +57,14 @@ components:
     ct: 5.75
     sweep: 40
     dihedral: 90
-    xle: 105
+    xle: 109
     yle: 0
     zle: 6.66
 
   fuselage:
     # Required Inputs
     title: 'Fuselage'
-    length: 123.31      # Fuselage length (ft)
+    length: 124.75      # Fuselage length (ft)
     width: 12.21        # Fuselage Width (ft)
     height: 13.17       # Fuselage height (ft)
 
@@ -92,8 +94,8 @@ components:
     thrust_reversal: False # (Optional)
 
 propulsion:
-  engine_type: 'turbofan'   # Turbofan of propeller currently
-  sfc_cruise: .545
+  engine_type: 'turbofan'
+  thrust_sea_level: 24200
 
 subsystem_parameters:
   subsystems: # Subsystems and their centers of gravity
@@ -157,6 +159,20 @@ mission_profile:
   descent:
     segment_type: descent
     weight_fraction: .995
+  climb_4:
+    run_sim: True
+    segment_type: climb
+    start_velocity: 421.952
+    end_velocity: 421.952
+    start_altitude: 1500
+    end_altitude: 10000
+  climb_5:
+    run_sim: True
+    segment_type: climb
+    start_velocity: 421.952
+    end_velocity: 518.427675
+    start_altitude: 10000
+    end_altitude: 20000
   cruise_diversion:
     segment_type: cruise
     mach: .5003
