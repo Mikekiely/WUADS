@@ -365,6 +365,8 @@ class loiter(MissionSegment):
                                                                       self.flight_conditions.mach,
                                                                       self.thrust)
 
+        self.max_thrust = max_thrust
+
         self.lift_to_drag = self.cl / self.cd
         self.weight_fraction = np.exp(-E * self.sfc/3600 / self.lift_to_drag)
 
