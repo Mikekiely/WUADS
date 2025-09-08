@@ -216,7 +216,7 @@ class Fuselage(PhysicalComponent):
         """
         Sets center of gravity and moments of inertia for fuselage.
         """
-        self.cg = [self.length * .45 + self.xle, 0, 0]
+        self.cg = [self.length * .5 + self.xle, 0, 0]
         super().set_cg()
 
     def update(self, variable, value):
