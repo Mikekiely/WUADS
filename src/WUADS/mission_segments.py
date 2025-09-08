@@ -378,7 +378,7 @@ class loiter(MissionSegment):
         self.wn = wn
         self.wi = wi
         self.fuel_burnt = self.wi - self.wn
-        self.range = self.time * self.flight_conditions.velocity
+        self.range = (self.time*3600) * self.flight_conditions.velocity / 6076.12
 
 
 class landing(MissionSegment):
