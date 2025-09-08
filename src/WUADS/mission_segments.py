@@ -158,7 +158,6 @@ class climb(MissionSegment):
 
         ps = self.flight_conditions.velocity * (max_thrust - D) / weight
 
-        print(f'ps: {ps:.2f}')
         fs = ps / (max_thrust * self.sfc/3600)
         self.fuel_burnt = delta_he / fs
         self.time = delta_he / ps
