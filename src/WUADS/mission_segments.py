@@ -107,6 +107,8 @@ class climb(MissionSegment):
         fc_end = FlightConditions(self.end_altitude, 0)
         mach_start = self.start_velocity / fc_start.a
         mach_end = self.end_velocity / fc_end.a
+        self.mach_start = mach_start
+        self.mach_end = mach_end
 
         self.mach = .5 * mach_start + .5 * mach_end
         fc = FlightConditions(self.altitude, self.mach)
@@ -144,6 +146,7 @@ class climb(MissionSegment):
 
         g = 32.1
         q = self.flight_conditions.q
+        q = .5 * self.flight_conditions.rho * self.flight_conditions.velocity ** 2
         sref = aircraft.sref
         D = self.cd * q * sref
         self.thrust = D
@@ -152,20 +155,29 @@ class climb(MissionSegment):
         self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.altitude, self.flight_conditions.mach)
 
         self.max_thrust = max_thrust
-        self.weight_fraction = np.exp(
-        -(self.sfc / 3600) * delta_he / (self.velocity * (1 - D / max_thrust)))
+
+        ps = self.flight_conditions.velocity * (max_thrust - D) / weight
+
+        print(f'ps: {ps:.2f}')
+        fs = ps / (max_thrust * self.sfc/3600)
+        self.fuel_burnt = delta_he / fs
+        self.time = delta_he / ps
+
+        # self.weight_fraction = np.exp(
+        # -(self.sfc / 3600) * delta_he / (self.velocity * (1 - D / max_thrust)))
         climb_angle = np.arcsin(max_thrust / weight - D / weight)
         rate_of_climb = self.velocity * np.sin(climb_angle)
         self.rate_of_climb = rate_of_climb
-        self.time = (self.end_altitude - self.start_altitude) / rate_of_climb
+        # self.time = (self.end_altitude - self.start_altitude) / rate_of_climb
         self.range = self.velocity * self.time / 6076.12
-        self.fuel_burnt = self.sfc * D * self.time
-        self.fuel_burnt = self.max_thrust * self.sfc * self.time
+        # self.fuel_burnt = self.sfc * D * self.time
+        # self.fuel_burnt = self.max_thrust * self.sfc * self.time
 
         if wn:
-            wi = wn / self.weight_fraction
+            wi = wn + self.fuel_burnt
         else:
-            wn = wi * self.weight_fraction
+            wn = wi - self.fuel_burnt
+        self.weight_fraction = wn / wi
 
         self.wi = wi
         self.wn = wn
