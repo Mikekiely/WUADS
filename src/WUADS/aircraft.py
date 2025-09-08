@@ -167,6 +167,12 @@ class Aircraft:
 
             mission_profile_params = config.get("mission_profile", None)
             self.mission.generate_mission_profile(mission_profile_params)
+            for comp in self.aero_components.values():
+                if comp.component_type == 'engine':
+                    comp.n_engines = self.n_engines
+                    comp.engine_type = self.propulsion.engine_type
+
+
 
     def generate_propulsion(self, n_engines=None, set_engine=True, **kwargs):
         """

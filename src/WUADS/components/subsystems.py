@@ -341,13 +341,13 @@ class Subsystems:
         # Nasa method
 
         if aircraft.aircraft_type == 'transport':
-            w_nasa = 1.1 * aircraft.cruise_conditions.mach ** .52 * scs ** .6 * wdg ** .32
+            w_nasa = 1.1 * aircraft.mach_cruise ** .52 * scs ** .6 * wdg ** .32
             comp.weight = .5 * (w_nasa + w_torenbeek)
         elif aircraft.aircraft_type == 'general_aviation':
             t0 = 519  # Rankine constant
             L = 0.003575  # temp lapse rate (R/ft)
             R = 1716.5  # Gas Constant
-            t = t0 - L * aircraft.cruise_conditions.h
+            t = t0 - L * aircraft.h_cruise
             theta = t / t0
             delta = theta ** (32.2 / (L * R))
             q_dive = 1481.35 * delta * aircraft.mission.max_mach ** 2
