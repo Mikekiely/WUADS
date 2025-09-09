@@ -134,7 +134,13 @@ class Aircraft:
 
             # Initialize defined aerodynamic components with given parameters
             for component_type, params in config.get("components", {}).items():
-                component_class = AEROBODY_CLASSES.get(component_type.lower())
+
+                if component_type.lower() in AEROBODY_CLASSES.keys():
+                    component_class = AEROBODY_CLASSES.get(component_type.lower())
+                elif 'module_name' in params:
+                    module = importlib.import_module(params['module_name'])
+                    component_class = getattr(module, params['class_name'])
+
                 if 'title' not in params:
                     params['title'] = component_type
                 try:
