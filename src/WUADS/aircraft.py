@@ -139,7 +139,7 @@ class Aircraft:
                     component_class = AEROBODY_CLASSES.get(component_type.lower())
                 elif 'module_name' in params:
                     module = importlib.import_module(params['module_name'])
-                    component_class = getattr(module, params['class_name'])
+                    component_class = getattr(module, params[class_name])
 
                 if 'title' not in params:
                     params['title'] = component_type
