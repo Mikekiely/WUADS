@@ -349,10 +349,11 @@ class propeller(engine):
     Standard piston powered propeller engine
     """
 
-    engine_type = 'propeller'
+
 
     def __init__(self, n_engines=1, horse_power=None, fuel_consumption_rate=None):
         super().__init__(n_engines)
+        self.engine_type = 'propeller'
         self.horse_power = horse_power
         self.fuel_consumption_rate = fuel_consumption_rate
 

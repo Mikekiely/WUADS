@@ -97,7 +97,7 @@ class Aircraft:
 
         self.input_file = config_file
         self.load_config()
-        self.set_weight(wdg_guess=wdg_guess)
+        self.set_weight(wdg_guess= wdg_guess)
         self.set_cd0()
         self.file_prefix = self.title
         if not self._output_dir:
@@ -185,7 +185,6 @@ class Aircraft:
         """
         if not 'engine_type' in kwargs:
             logger.warn('Engine Type is not declared in propulsion parameters, defaulting to turbofan')
-            engine_type = 'turbofan'
         else:
             engine_type = kwargs['engine_type']
 

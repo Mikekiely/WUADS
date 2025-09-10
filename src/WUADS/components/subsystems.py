@@ -71,6 +71,8 @@ class Subsystems:
         :rtype float
 
         """
+        params = self.parameters
+
         if aircraft.aircraft_type == 'transport':
             params = self.parameters
             # Raymer method (transport)
@@ -112,7 +114,9 @@ class Subsystems:
 
 
 
+
         comp.inertia = [comp.weight * x for x in comp.cg]
+
         self.components[comp.title] = comp
         return comp.weight
 

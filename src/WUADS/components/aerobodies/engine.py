@@ -83,6 +83,7 @@ class Engine(PhysicalComponent):
         # Set weight of fuel systems
         self.weight += self.fuel_system_weight(aircraft)
         self.set_cg()
+        print('weight',self.weight)
         return self.weight
 
     def set_cg(self):
@@ -128,11 +129,13 @@ class Engine(PhysicalComponent):
                 ktr = 1
 
             wec = 2.331 * self.w_engine ** .901 * kp * ktr
+            print(wec)
             self.weight_raymer = .6724 * kng * self.length**.1 * self.diameter**.294 * aircraft.ultimate_load**.119 * \
                                   wec ** .611 * self.n_engines**.984 * self.s_wet ** .224
             self.weight_nacelle = self.weight_raymer
         elif self.engine_type == 'propeller':
             self.weight_raymer = self.w_engine ** .922 * self.n_engines
+            self.weight_nacelle = self.weight_raymer
         return self.weight_raymer
 
     def controls_weight(self, aircraft):
@@ -180,7 +183,8 @@ class Engine(PhysicalComponent):
         :return: weight of the fuel system (lbs)
         :rtype: float
         """
-        vt = aircraft.mission.w_fuel / aircraft.mission.rho_fuel
+        vt = aircraft.w_fuel/ aircraft.mission.rho_fuel
+
         n_tank = aircraft.subsystems.parameters['n_tanks']
 
         if aircraft.aircraft_type == 'transport':
@@ -201,7 +205,9 @@ class Engine(PhysicalComponent):
             vi_vt = 1
             w_raymer = 2.49 * vt ** .726 * (1 / (1 + vi_vt)) ** .363 * n_tank ** .242 * self._n_engines ** .157
             # NASA method
-            w_nasa = 1.07 * aircraft.mission.w_fuel * .58 * self._n_engines ** .43
+            w_nasa = 1.07 * aircraft.w_fuel * .58 * self._n_engines ** .43
+
+
 
             self.weight_fuel_system = (w_nasa + w_raymer)/2
 
