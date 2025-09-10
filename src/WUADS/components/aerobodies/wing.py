@@ -116,7 +116,7 @@ class Wing(PhysicalComponent):
         tc = self.tc
         xc = self.xc
         mach = flight_conditions.mach
-        sweep = self.sweep
+        sweep = self.sweep_quarter_chord
         l_char = self.cref
 
         # From Raymer
