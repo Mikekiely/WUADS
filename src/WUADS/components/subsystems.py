@@ -172,12 +172,15 @@ class Subsystems:
         Calculates weight of air conditioning
         """
         # Uses nasa flops method (same for general and transport)
-        l = aircraft.aero_components['Fuselage'].length
-        w = aircraft.aero_components['Fuselage'].width
-        h = aircraft.aero_components['Fuselage'].height
-        w_nasa = 3.2 * (l * w * h) ** .6 + (9 * aircraft.mission.n_passengers ** .83) * aircraft.mission.max_mach + \
-                 .075 * self.parameters['w_avionics']
-        comp.weight = w_nasa
+        if 'Fuselage' in aircraft.aero_components.keys():
+            l = aircraft.aero_components['Fuselage'].length
+            w = aircraft.aero_components['Fuselage'].width
+            h = aircraft.aero_components['Fuselage'].height
+
+            w_nasa = 3.2 * (l * w * h) ** .6 + (9 * aircraft.mission.n_passengers ** .83) * aircraft.mission.max_mach + \
+                     .075 * self.parameters['w_avionics']
+            comp.weight = w_nasa
+
         if aircraft.aircraft_type == 'general_aviation':
              #Raymer method (experimental)
              w_raymer = .7 * (.265 * wdg ** .52 * aircraft.mission.n_passengers ** .68 * self.parameters['w_avionics'] ** .17 * aircraft.mission.max_mach ** .08)
@@ -327,12 +330,15 @@ class Subsystems:
         scs = 0 # Control surface area
         scs_i = 0   # used to find center of gravity
         for compon in aircraft.aero_components.values():
-            if isinstance(compon, Wing):
+            if hasattr(compon, 'area') and hasattr(compon, 'control_surface_ratio'):
                 scs += compon.area * compon.control_surface_ratio
                 scs_i += compon.area * compon.control_surface_ratio * \
                          (compon.xle + .25* compon.span * np.tan(compon.sweep))
 
-        comp.cg = [scs_i / scs, 0, 0]
+        if scs > 0:
+            comp.cg = [scs_i / scs, 0, 0]
+        else:
+            comp.cg = [0, 0, 0]
 
         # Raymer is innacurate
         # Torenbeek method (only factors in for transport aircrafts)
