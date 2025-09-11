@@ -126,13 +126,21 @@ class Wing_advanced(Wing):
             self.airfoil.append(self.airfoil[-1])
         while len(self.twist) < len(self.sections):
             self.twist.append(self.twist[-1])
+        self.create_sections()
 
+    def create_avl_sections(self):
         self.avl_sections = [[self.xle, self.yle, self.zle, self.cr, self.twist[0]]]
         i = 1
         for sec in self.sections[1:]:
             self.avl_sections.append([sec.xle, sec.yle, sec.zle, sec.cr, self.twist[i]])
             i += 1
-        self.avl_sections.append([self.sections[-1].xle_tip, self.sections[-1].yle_tip, self.sections[-1].zle_tip, self.ct, self.twist[-1]])
+
+        last_sec = self.sections[-1]
+        xle_tip = last_sec.xle + .5 * last_sec.span * np.tan(last_sec.sweep_le)
+        yle_tip = last_sec.yle + .5 * last_sec.span
+        zle_tip = last_sec.zle + .5 * last_sec.span * np.tan(last_sec.dihedral)
+
+        self.avl_sections.append([xle_tip, yle_tip, zle_tip, last_sec.ct, self.twist[-1]])
 
     def set_variables(self):
         # Set variables
