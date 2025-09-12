@@ -134,7 +134,13 @@ class Aircraft:
 
             # Initialize defined aerodynamic components with given parameters
             for component_type, params in config.get("components", {}).items():
-                component_class = AEROBODY_CLASSES.get(component_type.lower())
+
+                if component_type.lower() in AEROBODY_CLASSES.keys():
+                    component_class = AEROBODY_CLASSES.get(component_type.lower())
+                elif 'module_name' in params:
+                    module = importlib.import_module(params['module_name'])
+                    component_class = getattr(module, component_type)
+
                 if 'title' not in params:
                     params['title'] = component_type
                 try:
@@ -155,7 +161,7 @@ class Aircraft:
             if not 'Main Wing' in self.aero_components:
                 raise AttributeError('Main Wing component not declared')
 
-            # Propulsion parameterse
+            # Propulsion parameters
 
             # try:
             propulsion_parameters = config.get("propulsion", {})
@@ -507,7 +513,7 @@ class Aircraft:
     @n_engines.setter
     def n_engines(self, n):
         for comp in self.aero_components.values():
-            if comp.component_type == 'Nacelle':
+            if comp.component_type.lower() == 'engine':
                 comp.n_engines = n
         try:
             self.propulsion.n_engines = n

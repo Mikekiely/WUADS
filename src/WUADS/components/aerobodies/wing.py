@@ -16,40 +16,14 @@ class Wing(PhysicalComponent):
         :param dict params: <dict> list of parameters to edit
         """
 
-        # Defualt Values
-        self.sweep = 0           # c/4 sweep (rad)
-        self.sweep_location = .25    # location of the sweep definition (as a percentage of the chord)
-        self.sweep_deg = 0       # c/4 sweep (Deg)
-        self.sweep_le = 0        # Leading edge sweep (rad)
-        self.sweep_mid = 0       # c/2 sweep (rad)
-        self.sweep_te = 0        # Trailing edge sweep (rad)
-        self.sweep_quarter_chord = None
-        self.area = 0            # Planform surface area (ft^2)
-        self.aero_body = True
-        self.span = 0            # Wingspan (ft)
-        self.cref = 0            # Mean Aerodynamic Chord (ft)
-        self.airfoil = ''
-        self.aspect_ratio = 0    # Aspect Ratio
-        self.taper = 0           # Taper Ratio
-        self.cr = 0              # Root Chord
-        self.ct = 0              # Tip Chord
-        self.Q = 1               # interference factor
-        self.laminar_percent = .1    # Percentage of laminar flow
-        self.dihedral = 0        # Dihedral angle (rad)
-        self.dihedral_deg = 0    # Dihedral angle (deg)
-        self.tc = .12            # Airfoil Thickness (At Root)
-        self.hc = .008           # Camber
-        self.weight_averages = [.8, .2, 0]  # [Raymer, Torenbeek, NASA]
-        # self.weight_averages = [.15, .85, 0]
-        self.control_surface_ratio = .1
-        self.cd0 = 0
-        self.laminar_percent = .05
-        self.winglet = {}
-        self.xc = .35    # x value at mean camber line
-        self.avl_sections = []
+        self.load_default_values()
 
         super().__init__(params)
+        self.create_geometry(params)
 
+
+    def create_geometry(self, params):
+        self._load_variables(params)
         # Check if wing is well-defined
         vars_taper = ['xle', 'yle', 'zle', 'area', 'span', 'sweep', 'dihedral', 'taper']
         vars_chord = ['xle', 'yle', 'zle', 'span', 'cr', 'ct', 'sweep', 'dihedral']
@@ -104,6 +78,38 @@ class Wing(PhysicalComponent):
 
         # Set airfoils and twist
 
+    def load_default_values(self):
+        # Defualt Values
+        self.sweep = 0  # c/4 sweep (rad)
+        self.sweep_location = .25  # location of the sweep definition (as a percentage of the chord)
+        self.sweep_deg = 0  # c/4 sweep (Deg)
+        self.sweep_le = 0  # Leading edge sweep (rad)
+        self.sweep_mid = 0  # c/2 sweep (rad)
+        self.sweep_te = 0  # Trailing edge sweep (rad)
+        self.sweep_quarter_chord = None
+        self.area = 0  # Planform surface area (ft^2)
+        self.aero_body = True
+        self.span = 0  # Wingspan (ft)
+        self.cref = 0  # Mean Aerodynamic Chord (ft)
+        self.airfoil = ''
+        self.aspect_ratio = 0  # Aspect Ratio
+        self.taper = 0  # Taper Ratio
+        self.cr = 0  # Root Chord
+        self.ct = 0  # Tip Chord
+        self.Q = 1  # interference factor
+        self.laminar_percent = .1  # Percentage of laminar flow
+        self.dihedral = 0  # Dihedral angle (rad)
+        self.dihedral_deg = 0  # Dihedral angle (deg)
+        self.tc = .12  # Airfoil Thickness (At Root)
+        self.hc = .008  # Camber
+        self.weight_averages = [.8, .2, 0]  # [Raymer, Torenbeek, NASA]
+        # self.weight_averages = [.15, .85, 0]
+        self.control_surface_ratio = .1
+        self.cd0 = 0
+        self.laminar_percent = .05
+        self.winglet = {}
+        self.xc = .35  # x value at mean camber line
+        self.avl_sections = []
 
     def parasite_drag(self, flight_conditions, sref):
         """
@@ -116,7 +122,7 @@ class Wing(PhysicalComponent):
         tc = self.tc
         xc = self.xc
         mach = flight_conditions.mach
-        sweep = self.sweep
+        sweep = self.sweep_quarter_chord
         l_char = self.cref
 
         # From Raymer
@@ -158,7 +164,7 @@ class Wing(PhysicalComponent):
             area = .5 * (cr_i + ct_i) * dy
 
             # Elliptical lift dist
-            gamma = gamma_0 * np.sqrt(1 - (2 * y_dist[i] / self.span) ** 2)
+            gamma = gamma_0 * np.sqrt(1 - (2 * (y_dist[i] - self.yle) / self.span) ** 2)
             lprime = rho * v * gamma
             cl = lprime / (.5 * rho * v ** 2 * c)
             # Find the drag divergence number
