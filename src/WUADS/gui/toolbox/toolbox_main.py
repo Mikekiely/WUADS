@@ -11,13 +11,13 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QPushButton, QInputDialog, QDialog
 )
-from WUADS.gui.toolbox.aircraft_info import aircraft_info
-from WUADS.gui.toolbox.component_edit import component_edit
-from WUADS.gui.toolbox.mission_profile_edit import mission_profile_edit
-from WUADS.gui.toolbox.propulsion_input import propulsion_input
-from WUADS.gui.toolbox.subcomponent_edit import subcomponent_edit
-from WUADS.gui.toolbox.useful_load_edit import useful_load_edit
-from WUADS.gui.toolbox.analysis_list import analysis_list
+from .aircraft_info import aircraft_info
+from .component_edit import component_edit
+from .mission_profile_edit import mission_profile_edit
+from .propulsion_input import propulsion_input
+from .subcomponent_edit import subcomponent_edit
+from .useful_load_edit import useful_load_edit
+from .analysis_list import analysis_list
 
 subcomponent_types = {'Nose Landing Gear': 'nose_landing_gear',
                       'Main Landing Gear': 'main_landing_gear',
