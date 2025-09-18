@@ -96,12 +96,18 @@ def interpolate_curve(x, y, num_points=100):
 #TODO graphics and gui support for advanced wings
 
 def plot_wing(wing):
-
-    # Load Airfoil Points
-    with resources.open_text("WUADS.assets", "naca_0012.dat") as f:
-        # Normalize whitespace on each line
-        clean_lines = (" ".join(line.strip().split()) for line in f)
-        data = np.genfromtxt(clean_lines, delimiter=" ")
+    try:
+        # Installed package case
+        airfoil_path = resources.files("WUADS.assets").joinpath("naca_0012.dat")
+        with airfoil_path.open("r", encoding="utf-8") as f:
+            clean_lines = (" ".join(line.strip().split()) for line in f)
+            data = np.genfromtxt(clean_lines, delimiter=" ")
+    except (ModuleNotFoundError, AttributeError, FileNotFoundError):
+        # Cloned repo fallback
+        airfoil_path = Path(__file__).parent.parent / "assets" / "naca_0012.dat"
+        with airfoil_path.open("r", encoding="utf-8") as f:
+            clean_lines = (" ".join(line.strip().split()) for line in f)
+            data = np.genfromtxt(clean_lines, delimiter=" ")
 
     vert = False
     if wing.component_type == 'Vertical':
@@ -259,7 +265,15 @@ def plot_component(component):
             zle = [component.zle]
         mesh = pv.PolyData()
 
-        stl_path = resources.files("WUADS.assets").joinpath("nacelle.stl")
+        # stl_path = resources.files("WUADS.assets").joinpath("nacelle.stl")
+
+        try:
+            # Works when installed as a package
+            stl_path = resources.files("WUADS.assets").joinpath("nacelle.stl")
+        except (ModuleNotFoundError, AttributeError):
+            # Fallback for running from cloned repo
+            stl_path = Path(__file__).parent.parent / "assets" / "nacelle.stl"
+
         for x, y, z in zip(xle, yle, zle):
             # Read STL from package resource path
             temp = pv.read(str(stl_path)).rotate_y(-90, inplace=True)
