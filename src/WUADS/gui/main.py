@@ -20,8 +20,12 @@ def main():
     if args.config:
         config_path = Path(args.config)
     else:
-        # Use the default file in wuads/assets/737-800.yml
-        default_path = resources.files("WUADS.assets").joinpath("737-800.yml")
+        try:
+            # Works when installed as a package
+            default_path = resources.files("WUADS.assets").joinpath("737-800.yml")
+        except (ModuleNotFoundError, AttributeError):
+            # Fallback for running from cloned repo
+            default_path = Path(__file__).parent / "assets" / "737-800.yml"
         config_path = default_path
 
     aircraft = Aircraft(config_path)  # Pass path directly to Aircraft
