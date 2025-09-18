@@ -79,7 +79,7 @@ class Aircraft:
         self.weight_takeoff = 0  # Takeoff Gross Weight (lbs)
         self.weight_empty = 0  # Empty weight, no fuel, no cargo, no crew
         self.weight_max = 0  # Max Takeoff weight
-        self.weight_reference = 0  # Reference weight used to calculate component weights, typically the same as weight_max
+        self._w_ref = None  # Reference weight used to calculate component weights, typically the same as weight_max
 
         self._w_cargo = 0  # Cargo weight
         self._w_fuel = 0  # Fuel Weight
@@ -97,7 +97,7 @@ class Aircraft:
 
         self.input_file = config_file
         self.load_config()
-        self.set_weight(wdg_guess=wdg_guess)
+        self.set_weight(wdg_guess=wdg_guess, reference_weight=self.reference_weight)
         self.set_cd0()
         self.file_prefix = self.title
         if not self._output_dir:
@@ -260,7 +260,7 @@ class Aircraft:
             cdw += comp.set_wave_drag(self)
         return cd0, cdw
 
-    def set_weight(self, wdg_guess=None, fudge_factor=1.06):
+    def set_weight(self, wdg_guess=None, fudge_factor=1.06, reference_weight=None):
         """
         Uses and iterative loop to set all component weights and overall weight
 
@@ -277,6 +277,12 @@ class Aircraft:
 
         if self.lock_component_weights:
             wdg_guess = self.weight_max
+
+        if reference_weight or:
+            wdg_guess = reference_weight
+            self.reference_weight = reference_weight
+        elif self.reference_weight:
+            wdg_guess = self.reference_weight
 
         for i in range(max_iter):
             # Set structural component weights
@@ -302,7 +308,9 @@ class Aircraft:
             self.weight_empty += self.useful_load.w_pilots * 1.65 + self.useful_load.w_flight_attendants * 1.65
 
             # Check if converged
-            if np.abs((wdg_guess - self.weight_takeoff) / self.weight_takeoff) < margin or self.lock_component_weights:
+            if (np.abs((wdg_guess - self.weight_takeoff) / self.weight_takeoff) < margin
+                    or self.lock_component_weights
+                    or reference_weight):
                 break
 
             # adjust wdg guess
@@ -614,3 +622,18 @@ class Aircraft:
             sys.exit(1)
             return False
         self._file_prefix = prefix
+
+    @property
+    def reference_weight(self):
+        if self._w_ref:
+            return self._w_ref
+        else:
+            return 0
+
+    @reference_weight.setter
+    def reference_weight(self, weight):
+
+        if weight is not None and weight > 0:
+            self._w_ref = weight
+        else:
+            self._w_ref = None
