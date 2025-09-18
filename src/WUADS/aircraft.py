@@ -278,7 +278,7 @@ class Aircraft:
         if self.lock_component_weights:
             wdg_guess = self.weight_max
 
-        if reference_weight or:
+        if reference_weight:
             wdg_guess = reference_weight
             self.reference_weight = reference_weight
         elif self.reference_weight:
