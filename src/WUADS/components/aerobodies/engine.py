@@ -180,7 +180,7 @@ class Engine(PhysicalComponent):
         :return: weight of the fuel system (lbs)
         :rtype: float
         """
-        vt = aircraft.mission.w_fuel / aircraft.mission.rho_fuel
+        vt = aircraft.w_fuel / aircraft.mission.rho_fuel
         n_tank = aircraft.subsystems.parameters['n_tanks']
 
         if aircraft.aircraft_type == 'transport':
@@ -191,7 +191,7 @@ class Engine(PhysicalComponent):
             w_torenbeek = 80 * (self.n_engines + n_tank - 1) + 15 * n_tank ** .5 + vt ** .33
             # TODO fix all this to make it accessible to multiple nacelle configurations
             # NASA method
-            w_nasa = 1.07 * aircraft.mission.w_fuel ** .58 * n_tank ** .43 * aircraft.cruise_conditions.mach ** .34
+            w_nasa = 1.07 * aircraft.w_fuel ** .58 * n_tank ** .43 * aircraft.cruise_conditions.mach ** .34
 
             self.weight_fuel_system = (w_nasa + w_raymer + w_torenbeek) / 3
 
