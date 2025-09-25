@@ -260,14 +260,18 @@ class Aircraft:
             cdw += comp.set_wave_drag(self)
         return cd0, cdw
 
-    def set_weight(self, wdg_guess=None, fudge_factor=1.06, reference_weight=None):
+    def set_weight(self, wdg_guess=None, fudge_factor=1.06, reference_weight=None, components_changed=None):
         """
         Uses and iterative loop to set all component weights and overall weight
 
         Parameters: wdg_guess: Initial guess for gross design weight (lbs)
         fudge_factor: <float> Margin to multiply overall weight by. Good practice to leave at ~1.06 to account
                               for various un modelled weights
+        reference_weight: <float> Design gross weight used to set the component weights, overrides the iterative process
+        components_changed: <bool> List of components changed, only used if you're using the update_components function
         """
+        if components_changed is None:
+            components_changed = []
         if not wdg_guess:
             wdg_guess = self.weight_takeoff
         self.weight_takeoff = 1
@@ -276,7 +280,7 @@ class Aircraft:
         max_iter = 100
 
         if self.lock_component_weights:
-            wdg_guess = self.weight_max
+            wdg_guess = self.reference_weight
 
         if reference_weight:
             wdg_guess = reference_weight
@@ -284,18 +288,26 @@ class Aircraft:
         elif self.reference_weight:
             wdg_guess = self.reference_weight
 
+
         for i in range(max_iter):
             # Set structural component weights
+
             self.weight_takeoff = 0
             for comp in self.aero_components.values():
-                self.weight_takeoff += comp.set_weight(self, wdg_guess)
-                comp.set_cg()
+                if self.lock_component_weights and (comp.title not in components_changed):
+                    self.weight_takeoff += comp.weight
+                else:
+                    self.weight_takeoff += comp.set_weight(self, wdg_guess)
+                    comp.set_cg()
 
             for comp in self.misc_components.values():
                 self.weight_takeoff += comp.weight
 
             # Set subsystem Weights
-            self.weight_takeoff += self.subsystems.set_subsystem_weights(self, wdg_guess)
+            if self.lock_component_weights:
+                self.weight_takeoff += self.subsystems.weight
+            else:
+                self.weight_takeoff += self.subsystems.set_subsystem_weights(self, wdg_guess)
 
             # Add fudge factor
             self.weight_takeoff *= fudge_factor
@@ -350,8 +362,10 @@ class Aircraft:
         if not isinstance(variables, list):
             variables = [variables]
         # Set variables
+        components_changed = []
         for var in variables:
             title = var[0]
+            components_changed.append(title)
             variable = var[1]
             value = var[2]
             # Check if title is in aero components
@@ -360,7 +374,7 @@ class Aircraft:
 
         # Re-initialize the weights and drag
         self.sref = self.aero_components['Main Wing'].area
-        self.set_weight()
+        self.set_weight(components_changed=components_changed)
         self.set_cd0()
 
     def add_component(self, component_type, params):
