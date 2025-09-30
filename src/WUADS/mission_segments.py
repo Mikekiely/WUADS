@@ -210,8 +210,6 @@ class cruise(MissionSegment):
     def breguet_range(self, aircraft, wn=None, wi=None):
         # determines the fuel burnt during a set range cruise segment
 
-        self.flight_conditions = aircraft.cruise_conditions
-
         self.cd0, self.cdw = aircraft.get_cd0(self.altitude, self.mach)
         if self.range is None:
             sys.exit('Please input a desired range or set find_range to true')
