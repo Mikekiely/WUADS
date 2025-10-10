@@ -79,7 +79,7 @@ class Aircraft:
         self.weight_takeoff = 0  # Takeoff Gross Weight (lbs)
         self.weight_empty = 0  # Empty weight, no fuel, no cargo, no crew
         self.weight_max = 0  # Max Takeoff weight
-        self.weight_reference = 0  # Reference weight used to calculate component weights, typically the same as weight_max
+        self._w_ref = None  # Reference weight used to calculate component weights, typically the same as weight_max
 
         self._w_cargo = 0  # Cargo weight
         self._w_fuel = 0  # Fuel Weight
@@ -97,7 +97,7 @@ class Aircraft:
 
         self.input_file = config_file
         self.load_config()
-        self.set_weight(wdg_guess= wdg_guess)
+        self.set_weight(wdg_guess=wdg_guess, reference_weight=self.reference_weight)
         self.set_cd0()
         self.file_prefix = self.title
         if not self._output_dir:
@@ -238,11 +238,11 @@ class Aircraft:
         """
         # https://arc.aiaa.org/doi/abs/10.2514/1.47557
 
-        cd0, cdw = self.get_cd0(Aircraft)
+        cd0, cdw = self.get_cd0()
         self.cd0 = cd0
         self.cdw = cdw
 
-    def get_cd0(self, aircraft, height=None, mach=None):
+    def get_cd0(self, height=None, mach=None):
         # https://arc.aiaa.org/doi/abs/10.2514/1.47557
 
         if height == None:
@@ -259,14 +259,18 @@ class Aircraft:
             cdw += comp.set_wave_drag(self)
         return cd0, cdw
 
-    def set_weight(self, wdg_guess=None, fudge_factor=1.06):
+    def set_weight(self, wdg_guess=None, fudge_factor=1.06, reference_weight=None, components_changed=None):
         """
         Uses and iterative loop to set all component weights and overall weight
 
         Parameters: wdg_guess: Initial guess for gross design weight (lbs)
         fudge_factor: <float> Margin to multiply overall weight by. Good practice to leave at ~1.06 to account
                               for various un modelled weights
+        reference_weight: <float> Design gross weight used to set the component weights, overrides the iterative process
+        components_changed: <bool> List of components changed, only used if you're using the update_components function
         """
+        if components_changed is None:
+            components_changed = []
         if not wdg_guess:
             wdg_guess = self.weight_takeoff
         self.weight_takeoff = 1
@@ -275,20 +279,34 @@ class Aircraft:
         max_iter = 100
 
         if self.lock_component_weights:
-            wdg_guess = self.weight_max
+            wdg_guess = self.reference_weight
+
+        if reference_weight:
+            wdg_guess = reference_weight
+            self.reference_weight = reference_weight
+        elif self.reference_weight:
+            wdg_guess = self.reference_weight
+
 
         for i in range(max_iter):
             # Set structural component weights
+
             self.weight_takeoff = 0
             for comp in self.aero_components.values():
-                self.weight_takeoff += comp.set_weight(self, wdg_guess)
-                comp.set_cg()
+                if self.lock_component_weights and (comp.title not in components_changed):
+                    self.weight_takeoff += comp.weight
+                else:
+                    self.weight_takeoff += comp.set_weight(self, wdg_guess)
+                    comp.set_cg()
 
             for comp in self.misc_components.values():
                 self.weight_takeoff += comp.weight
 
             # Set subsystem Weights
-            self.weight_takeoff += self.subsystems.set_subsystem_weights(self, wdg_guess)
+            if self.lock_component_weights:
+                self.weight_takeoff += self.subsystems.weight
+            else:
+                self.weight_takeoff += self.subsystems.set_subsystem_weights(self, wdg_guess)
 
             # Add fudge factor
             self.weight_takeoff *= fudge_factor
@@ -301,7 +319,9 @@ class Aircraft:
             self.weight_empty += self.useful_load.w_pilots * 1.65 + self.useful_load.w_flight_attendants * 1.65
 
             # Check if converged
-            if np.abs((wdg_guess - self.weight_takeoff) / self.weight_takeoff) < margin or self.lock_component_weights:
+            if (np.abs((wdg_guess - self.weight_takeoff) / self.weight_takeoff) < margin
+                    or self.lock_component_weights
+                    or reference_weight):
                 break
 
             # adjust wdg guess
@@ -341,8 +361,10 @@ class Aircraft:
         if not isinstance(variables, list):
             variables = [variables]
         # Set variables
+        components_changed = []
         for var in variables:
             title = var[0]
+            components_changed.append(title)
             variable = var[1]
             value = var[2]
             # Check if title is in aero components
@@ -351,7 +373,7 @@ class Aircraft:
 
         # Re-initialize the weights and drag
         self.sref = self.aero_components['Main Wing'].area
-        self.set_weight()
+        self.set_weight(components_changed=components_changed)
         self.set_cd0()
 
     def add_component(self, component_type, params):
@@ -613,3 +635,18 @@ class Aircraft:
             sys.exit(1)
             return False
         self._file_prefix = prefix
+
+    @property
+    def reference_weight(self):
+        if self._w_ref:
+            return self._w_ref
+        else:
+            return 0
+
+    @reference_weight.setter
+    def reference_weight(self, weight):
+
+        if weight is not None and weight > 0:
+            self._w_ref = weight
+        else:
+            self._w_ref = None

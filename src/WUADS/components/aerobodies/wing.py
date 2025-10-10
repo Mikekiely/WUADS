@@ -194,7 +194,7 @@ class Wing(PhysicalComponent):
             scsw = self.control_surface_ratio * self.area
             self.weight_raymer = .0051 * (
                         wdg * aircraft.ultimate_load) ** .557 * self.area ** .649 * self.aspect_ratio ** .5 \
-                                 * self.tc ** -.4 * (1 + self.taper) ** .1 * np.cos(self.sweep) ** -1 * scsw ** .1
+                                 * self.tc ** -.4 * (1 + self.taper) ** .1 * np.cos(self.sweep_quarter_chord) ** -1 * scsw ** .1
         elif aircraft.aircraft_type == 'general_aviation':
             W_fw = aircraft.w_fuel # weight of fuel in wing
             a = .036 * self.area ** .758 * W_fw ** .0035
