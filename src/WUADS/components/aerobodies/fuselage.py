@@ -44,7 +44,34 @@ class Fuselage(PhysicalComponent):
         # Torenbeek 1988 wetted area estimation
         self.s_wet = np.pi * self.diameter * self.length * (1 - 2 / f) ** (2 / 3) * (1 + 1 / (f ** 2))
 
-    def parasite_drag(self, flight_conditions, sref):
+    # def parasite_drag(self, flight_conditions, sref):
+    #     """
+    #     Calculates fuselage drag coefficient using method from gotten et. al.
+    #     https://doi.org/10.2514/1.C036032
+    #
+    #     :param flight_conditions: flight conditions object at cruise
+    #     :param float sref: aircraft reference area
+    #     """
+    #     if self.diameter == 0 or self.length == 0:
+    #         self.cd0 = 0
+    #         self.cdw = 0
+    #         return 0
+    #
+    #
+    #     l_char = self.length
+    #     d = self.diameter
+    #     w = self.width
+    #     cs1 = -.825885 * (d / w) ** .411795 + 4.0001
+    #     cs2 = -.340977 * (d / w) ** 7.54327 - 2.27920
+    #     cs3 = -.013846 * (d / w) ** 1.34253 + 1.11029
+    #     form_factor = cs1 * (l_char / d) ** cs2 + cs3
+    #
+    #     re = flight_conditions.rho * flight_conditions.velocity * l_char / flight_conditions.mu
+    #     cf = (1 / (3.46 * np.log10(re) - 5.6)) ** 2
+    #     if sref == 0:
+    #         return
+    #     self.cd0 = cf * form_factor * self.Q * self.s_wet / sref
+    def parasite_drag(self, flight_conditions, sref, aircraft):
         """
         Calculates fuselage drag coefficient using method from gotten et. al.
         https://doi.org/10.2514/1.C036032
@@ -52,25 +79,41 @@ class Fuselage(PhysicalComponent):
         :param flight_conditions: flight conditions object at cruise
         :param float sref: aircraft reference area
         """
+        sref = aircraft.sref
         if self.diameter == 0 or self.length == 0:
             self.cd0 = 0
             self.cdw = 0
             return 0
 
+        if aircraft.aircraft_type == 'transport':
+            l_char = self.length
+            d = self.diameter
+            w = self.width
+            cs1 = -.825885 * (d / w) ** .411795 + 4.0001
+            cs2 = -.340977 * (d / w) ** 7.54327 - 2.27920
+            cs3 = -.013846 * (d / w) ** 1.34253 + 1.11029
+            form_factor = cs1 * (l_char / d) ** cs2 + cs3
+        elif aircraft.aircraft_type == 'general_aviation':
+            # Raymer method instead
+            l_char = self.length  # Fuselage length
+            d = self.diameter  # Fuselage diameter
 
-        l_char = self.length
-        d = self.diameter
-        w = self.width
-        cs1 = -.825885 * (d / w) ** .411795 + 4.0001
-        cs2 = -.340977 * (d / w) ** 7.54327 - 2.27920
-        cs3 = -.013846 * (d / w) ** 1.34253 + 1.11029
-        form_factor = cs1 * (l_char / d) ** cs2 + cs3
+            # Raymer fuselage form factor (Eq. 12.31)
+            FF_raymer = 1 + (60 / (l_char / d) ** 3) + 0.0025 * (l_char / d)
+
+            # Apply GA correction factor for bluffness, roughness, etc.
+            correction_factor = 1.4  # 30% increase for light aircraft
+            form_factor = FF_raymer * correction_factor
 
         re = flight_conditions.rho * flight_conditions.velocity * l_char / flight_conditions.mu
         cf = (1 / (3.46 * np.log10(re) - 5.6)) ** 2
+
+        #change to equivalent skin friction
+        #cf = .0055
         if sref == 0:
             return
         self.cd0 = cf * form_factor * self.Q * self.s_wet / sref
+
 
     def set_weight(self, aircraft, wdg):
         if self.length == 0 or self.diameter == 0:

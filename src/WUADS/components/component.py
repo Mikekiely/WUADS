@@ -140,6 +140,9 @@ class PhysicalComponent(Component):
         cfturb = .455 / (np.log10(Re) ** 2.58 * (1 + .144 * mach ** 2) ** .65)
         cf = self.laminar_percent * cflam + (1 - self.laminar_percent) * cfturb
         # cf = .0055
+
+
+
         if sref == 0:
             return 0
         else:

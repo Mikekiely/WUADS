@@ -1,5 +1,7 @@
 from .aircraft import Aircraft
 import os
+from .components.aerobodies.engine import Engine
+
 
 def weights_report(aircraft: Aircraft, filename=None):
     """
@@ -32,8 +34,12 @@ def weights_report(aircraft: Aircraft, filename=None):
         f.write(f'\t\t\t\t\t\tWeight (lbs)\tX cg (ft)\n')
         f.write(f'\t\t\t\t\t\t--------------------------------\n')
         max_variable_name_length = max(len(name) for name in aircraft.aero_components.keys()) + 3
-
         for comp in aircraft.aero_components.values():
+            if isinstance(comp, Engine):
+                total_weight = comp.weight  # or comp.weight_total if you have that
+
+            else:
+                total_weight = comp.weight
             f.write("{:<{name_width}} {:>{weight_width}.2f} {:>{cg_width}.2f}\n".format(comp.title,
                                                                                   comp.weight,
                                                                                   comp.cg[0],

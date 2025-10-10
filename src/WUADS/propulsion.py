@@ -6,6 +6,8 @@ from .flight_conditions import FlightConditions
 import numpy as np
 logger = logging.getLogger(__name__)
 
+
+
 class engine:
     """
     Contains all analyses and variables required to analyze propulsion performance
@@ -349,35 +351,47 @@ class propeller(engine):
     Standard piston powered propeller engine
     """
 
-
+    #engine_type = 'propeller'
 
     def __init__(self, n_engines=1, horse_power=None, fuel_consumption_rate=None):
         super().__init__(n_engines)
-        self.engine_type = 'propeller'
         self.horse_power = horse_power
+        self.current_horse_power = horse_power
         self.fuel_consumption_rate = fuel_consumption_rate
+        self.current_fuel_consumption_rate = fuel_consumption_rate
+        self.engine_type = 'propeller'
 
     def analyze_performance(self, height, mach, thrust_required=None):
-        nu_propeller = self.prop_efficiency(mach)
+
 
         # Flight conditions and velocity (ft/s)
         fc = FlightConditions(height, mach)
         V = mach * fc.a  # ft/s
 
-        total_horse_power = self.n_engines * self.horse_power
+        #efficiency calculation
+        nu_propeller = self.prop_efficiency(mach)
+
+        #altitude horsepower correction equation 14.5 from Nicolai
+        rho = fc.rho  # air density at altitude (slugs/ft^3 if imperial)
+        rho_sl = 0.0023769  # sea-level density, slugs/ft^3
+        Bhp_sl = self.horse_power
+
+        Bhp_h = Bhp_sl * (rho / rho_sl - (1 - rho / rho_sl) / 7.75)  # available hp at altitude
+        total_horse_power = self.n_engines * Bhp_h
+
         P_generated = total_horse_power * 550  # horsepower to ft-lb/s
         P_available = nu_propeller * P_generated
 
         fuel_density = 6.2  # lbs/gal (Avgas density adjusted slightly for temperature differences)
-        total_fuel_consumption = self.n_engines * self.fuel_consumption_rate  # gal/hr
+        total_fuel_consumption = self.n_engines * self.current_fuel_consumption_rate  # gal/hr
         fuel_mass_flow_rate_lb_per_hr = total_fuel_consumption * fuel_density  # lbs/hr
 
         # Handle very low or zero velocity case (static thrust approximation)
         if V <= 1e-3 or np.isnan(V):
             # Estimate static thrust as empirical factor * total horsepower
+
             static_thrust_factor = 2.5  # lbf per horsepower (typical GA propeller estimate)
             max_thrust = total_horse_power * static_thrust_factor
-
             sfc = fuel_mass_flow_rate_lb_per_hr / (max_thrust + 1e-6)  # Avoid div by zero
         else:
             max_thrust = P_available / V  # lbf
@@ -386,22 +400,29 @@ class propeller(engine):
             sfc = fuel_mass_flow_rate_lb_per_hr / thrust  # lb/(lbf*hr)
 
         self.max_thrust = max_thrust
+
+
         return sfc, max_thrust
 
     # alernative method from section 3.1: https://www.fzt.haw-hamburg.de/pers/Scholz/transfer/Airport2030_TN_Propeller-Efficiency_13-08-12_SLZ.pdf
     @staticmethod
     def prop_efficiency(mach):
-        nu_max = 0.85  # can adjust
-        if mach == 0:
-            nu_propeller = .8  # default? not sure what happens at 0 velocity
-        elif 0 < mach <= 0.1:
-            nu_propeller = 10 * mach * nu_max
-        elif .1 < mach <= 0.7:
-            nu_propeller = nu_max
-        elif .7 < mach < 0.85:
-            nu_propeller = 10 * mach * nu_max * (1 - (mach - 0.7) / 3)
-        else:
-            nu_propeller = max(0.0, 10 * mach * nu_max * (
-                        1 - (mach - 0.7) / 3))  # prevent negative (just sets to 0 if negative)
+        # nu_max = 0.9  # can adjust
+        #
+        # if mach <= 0.1:
+        #     nu_propeller = 10 * mach * nu_max
+        #
+        #
+        # elif .1 < mach <= 0.7:
+        #     nu_propeller = nu_max
+        #
+        # elif .7 < mach < 0.85:
+        #     nu_propeller = 10 * mach * nu_max * (1 - (mach - 0.7) / 3)
+        #
+        # else:
+        #     nu_propeller = max(0.0, 10 * mach * nu_max * (
+        #                 1 - (mach - 0.7) / 3))  # prevent negative (just sets to 0 if negative)
+        nu_propeller = .9
 
         return nu_propeller
+

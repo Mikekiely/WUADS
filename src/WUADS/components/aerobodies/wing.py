@@ -111,7 +111,7 @@ class Wing(PhysicalComponent):
         self.xc = .35  # x value at mean camber line
         self.avl_sections = []
 
-    def parasite_drag(self, flight_conditions, sref):
+    def parasite_drag(self, flight_conditions, sref, aircraft):
         """
         Sets Wing parasite drag coefficient using Raymer Method
 

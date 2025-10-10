@@ -238,11 +238,11 @@ class Aircraft:
         """
         # https://arc.aiaa.org/doi/abs/10.2514/1.47557
 
-        cd0, cdw = self.get_cd0()
+        cd0, cdw = self.get_cd0(Aircraft)
         self.cd0 = cd0
         self.cdw = cdw
 
-    def get_cd0(self, height=None, mach=None):
+    def get_cd0(self, aircraft, height=None, mach=None):
         # https://arc.aiaa.org/doi/abs/10.2514/1.47557
 
         if height == None:
@@ -254,7 +254,7 @@ class Aircraft:
         cdw = 0
         fc = FlightConditions(height, mach)
         for comp in self.aero_components.values():
-            comp.parasite_drag(fc, self.sref)
+            comp.parasite_drag(fc, self.sref, self)
             cd0 += comp.cd0
             cdw += comp.set_wave_drag(self)
         return cd0, cdw

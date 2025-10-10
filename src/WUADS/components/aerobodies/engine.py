@@ -44,7 +44,7 @@ class Engine(PhysicalComponent):
         # Find wetted surface area
         self.s_wet = np.pi * self.diameter * self.length
 
-    def parasite_drag(self, flight_conditions, sref):
+    def parasite_drag(self, flight_conditions, sref, aircraft ):
         """
         Set nacelle parasite drag using Raymer method.
 
@@ -71,6 +71,9 @@ class Engine(PhysicalComponent):
         self.weight = 0
         # Set nacelle weight
         self.weight += self.raymer_weight(aircraft, wdg)
+        # added this line so that the nacelle weight is the weight of the entire engine
+        # This is technically not right but otherwise the weight isn't being taken into account
+        self.weight_nacelle = self.weight
 
         # Add additional turbofan components if required
         if self.engine_type == 'turbofan' or aircraft.aircraft_type == 'transport':
@@ -83,7 +86,7 @@ class Engine(PhysicalComponent):
         # Set weight of fuel systems
         self.weight += self.fuel_system_weight(aircraft)
         self.set_cg()
-        print('weight',self.weight)
+
         return self.weight
 
     def set_cg(self):
@@ -129,7 +132,7 @@ class Engine(PhysicalComponent):
                 ktr = 1
 
             wec = 2.331 * self.w_engine ** .901 * kp * ktr
-            print(wec)
+
             self.weight_raymer = .6724 * kng * self.length**.1 * self.diameter**.294 * aircraft.ultimate_load**.119 * \
                                   wec ** .611 * self.n_engines**.984 * self.s_wet ** .224
             self.weight_nacelle = self.weight_raymer

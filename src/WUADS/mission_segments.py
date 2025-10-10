@@ -60,6 +60,9 @@ class takeoff(MissionSegment):
 
     def breguet_range(self, aircraft, wi=None, wn=None):
         # SFC = fuelflow/thrust
+        #propeller_engine_adjust(self,aircraft)
+
+
         thrust = self.thrust_setting * aircraft.propulsion.max_thrust
         self.sfc, self.max_thrust = aircraft.propulsion.analyze_performance(
                 self.altitude, self.mach, self.thrust
@@ -115,6 +118,9 @@ class climb(MissionSegment):
         self.flight_conditions = fc
 
     def breguet_range(self, aircraft, wi=None, wn=None):
+        #propeller_engine_adjust(self, aircraft)
+
+
         cd0, cdw = aircraft.get_cd0(self.altitude, self.mach)
         self.cd0 = cd0
 
@@ -231,7 +237,7 @@ class cruise(MissionSegment):
         self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.flight_conditions.altitude,
                                                                       self.flight_conditions.mach,
                                                                       self.thrust)
-
+        print(self.sfc)
         range_feet = self.range * 6076.12
         self.weight_fraction = np.exp(-range_feet * self.sfc / 3600 / (self.flight_conditions.velocity * self.lift_to_drag))
         if wi:
@@ -266,10 +272,12 @@ class cruise(MissionSegment):
 
 
         sfc = self.sfc / 3600
+        print('sfc:', sfc)
 
         self.range = np.log(self.weight_fraction) * self.flight_conditions.velocity * self.lift_to_drag / (-sfc) / 6076.12
         self.fuel_burnt = wi-wn
         range_feet = self.range * 6076.12
+        print(range_feet)
         self.time = range_feet / self.flight_conditions.velocity
         self.max_thrust = max_thrust
 
@@ -436,3 +444,30 @@ class weight_drop(MissionSegment):
         self.weight_fraction = 1
 
 #TODO test out wieght drop
+
+def propeller_engine_adjust(self, aircraft):
+    """
+    Adjusts propulsion horsepower for this mission segment
+    if engine type is propeller.
+    """
+    if aircraft.propulsion.engine_type != "propeller":
+        return  # skip if not a propeller engine
+
+    base_hp = aircraft.propulsion.horse_power
+    base_fuel_consumption = aircraft.propulsion.fuel_consumption_rate
+
+    if self.segment_type == "takeoff":
+        aircraft.propulsion.current_horse_power = base_hp  # 100% power
+        aircraft.propulsion.current_fuel_consumption_rate = base_fuel_consumption * 1.4
+    elif self.segment_type == "climb":
+        aircraft.propulsion.current_horse_power = 0.85 * base_hp  # climb derate
+        aircraft.propulsion.current_fuel_consumption_rate = base_fuel_consumption * 1.2
+    elif self.segment_type == "cruise":
+        aircraft.propulsion.current_horse_power = 0.70 * base_hp  # cruise setting
+        aircraft.propulsion.current_fuel_consumption_rate = base_fuel_consumption
+    elif self.segment_type == "loiter":
+        aircraft.propulsion.current_horse_power = 0.50 * base_hp  # economy mode
+        aircraft.propulsion.current_fuel_consumption_rate = base_fuel_consumption * .7
+    else:
+        aircraft.propulsion.current_horse_power = base_hp
+        aircraft.propulsion.current_fuel_consumption_rate = base_fuel_consumption

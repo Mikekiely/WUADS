@@ -73,6 +73,7 @@ class Mission:
         mission_profile = self.mission_profile  # use the existing mission profile defined by user
         wi = aircraft.weight_takeoff
 
+
         if not mute_output:
             logger.info("Generating mission profile...")
 
