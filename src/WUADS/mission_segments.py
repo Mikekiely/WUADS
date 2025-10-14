@@ -235,7 +235,6 @@ class cruise(MissionSegment):
         self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.flight_conditions.altitude,
                                                                       self.flight_conditions.mach,
                                                                       self.thrust)
-        print(self.sfc)
         range_feet = self.range * 6076.12
         self.weight_fraction = np.exp(-range_feet * self.sfc / 3600 / (self.flight_conditions.velocity * self.lift_to_drag))
         if wi:
@@ -270,12 +269,10 @@ class cruise(MissionSegment):
 
 
         sfc = self.sfc / 3600
-        print('sfc:', sfc)
 
         self.range = np.log(self.weight_fraction) * self.flight_conditions.velocity * self.lift_to_drag / (-sfc) / 6076.12
         self.fuel_burnt = wi-wn
         range_feet = self.range * 6076.12
-        print(range_feet)
         self.time = range_feet / self.flight_conditions.velocity
         self.max_thrust = max_thrust
 
