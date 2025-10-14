@@ -109,6 +109,27 @@ class Aircraft:
         Reads input YAML file and initializes aircraft and declared components
         """
 
+        def load_user_module(identifier):
+            """
+            Loads a user-specified module, which can be either:
+              - a Python module name (importable via sys.path)
+              - or a direct path to a .py file
+            Returns: the loaded module object
+            """
+            # Case 1: user passed a path to a .py file
+            if identifier.endswith('.py') or os.path.sep in identifier or os.path.exists(identifier):
+                path = os.path.abspath(identifier)
+                module_name = os.path.splitext(os.path.basename(path))[0]
+                spec = importlib.util.spec_from_file_location(module_name, path)
+                module = importlib.util.module_from_spec(spec)
+                sys.modules[module_name] = module
+                spec.loader.exec_module(module)
+                return module
+
+            # Case 2: user passed a normal importable module name
+            else:
+                return importlib.import_module(identifier)
+
         self.mission = Mission(self)
         with open(self.input_file) as f:
             # yml = YAML(typ='safe', pure=True)
@@ -138,7 +159,7 @@ class Aircraft:
                 if component_type.lower() in AEROBODY_CLASSES.keys():
                     component_class = AEROBODY_CLASSES.get(component_type.lower())
                 elif 'module_name' in params:
-                    module = importlib.import_module(params['module_name'])
+                    module = load_user_module(params['module_name'])
                     component_class = getattr(module, component_type)
 
                 if 'title' not in params:
