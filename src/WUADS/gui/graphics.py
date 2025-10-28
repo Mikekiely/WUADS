@@ -145,14 +145,24 @@ def plot_wing(wing):
     else:
         yle_ar = np.linspace(wing.yle, wing.yle + b, n)
 
-    for yle in yle_ar:
+    scaled = False
+    if hasattr(wing, 'airfoil_thickness') and isinstance(wing.airfoil_thickness, list):
+        scale_factor = np.linspace((wing.airfoil_thickness[0] / .12), (wing.airfoil_thickness[1] / .12), n)
+        scaled = True
+
+    for i in range(len(yle_ar)):
+        yle = yle_ar[i]
         if not vert:
             xle = wing.xle + (yle - wing.yle) * np.tan(sweep)
             zle = wing.zle + (yle - wing.yle) * np.tan(dihedral)
             chord = S / ((1 + taper) * b) * (1 - (1 - taper) / (2 * b) * np.abs(2 * (yle - wing.yle)))
             x.append(np.array(x_profile * chord + xle))
             y.append(np.linspace(yle, yle, len(x_profile)))
-            z.append(np.array(z_profile * chord + zle))
+
+            if scaled:
+                z.append(np.array((z_profile * chord) * scale_factor[i] + zle))
+            else:
+                z.append(np.array(z_profile * chord + zle))
         else:
             zle = yle
             xle = wing.xle + (zle - wing.zle) * np.tan(sweep)

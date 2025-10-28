@@ -27,6 +27,15 @@ class Wing(PhysicalComponent):
         # Check if wing is well-defined
         vars_taper = ['xle', 'yle', 'zle', 'area', 'span', 'sweep', 'dihedral', 'taper']
         vars_chord = ['xle', 'yle', 'zle', 'span', 'cr', 'ct', 'sweep', 'dihedral']
+
+        if 'airfoil_thickness' in params:
+            if isinstance(params['airfoil_thickness'], list):
+                self.airfoil_thickness = params['airfoil_thickness']
+                params['tc'] = self.airfoil_thickness[0]
+                self.tc = self.airfoil_thickness[0]
+            else:
+                self.airfoil_thickness = [params['airfoil_thickness'], params['airfoil_thickness']]
+
         if all(key in params for key in vars_taper):
             # Wing is defined by taper ratio, define root and tip chord lengths
             cr = 2 * self.area / (self.span * (1 + self.taper))
