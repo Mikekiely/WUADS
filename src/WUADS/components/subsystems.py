@@ -114,7 +114,6 @@ class Subsystems:
                 # w_torenbeek = kgr * (ag + bg * wdg ** .75 + cg * wdg + dg * wdg ** 1.5)
                 comp.weight = w_raymer  #* .2 + w_torenbeek * .8
 
-        comp.inertia = [comp.weight * x for x in comp.cg]
 
         self.components[comp.title] = comp
         return comp.weight
@@ -172,7 +171,6 @@ class Subsystems:
                 #comp.weight =( w_raymer + w_nasa ) / 2
                 comp.weight = w_raymer
 
-        comp.inertia = [comp.weight * x for x in comp.cg]
 
         return comp.weight
 
@@ -201,7 +199,6 @@ class Subsystems:
 
                  comp.weight = .5 * (w_raymer + w_nasa)
 
-        comp.inertia = [comp.weight * x for x in comp.cg]
 
         return comp.weight
 
