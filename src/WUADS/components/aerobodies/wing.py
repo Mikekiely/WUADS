@@ -139,7 +139,7 @@ class Wing(PhysicalComponent):
         # TODO Add shevell method
         super().parasite_drag(form_factor, l_char, flight_conditions, sref)
 
-    def set_wave_drag(self, aircraft):
+    def set_wave_drag(self, aircraft, flight_conditions=None):
         """
         Set wave drag for the wing
         Uses methods from Gur and Mason
@@ -150,13 +150,19 @@ class Wing(PhysicalComponent):
         :return: Wave drag for the wing
         :rtype: int
         """
+        fc = flight_conditions
+        if fc is None:
+            fc = aircraft.cruise_conditions
+
+
         # split wing into strips
         n_strips = 20
         chords = np.linspace(self.cr, self.ct, n_strips+1)
         dy = .5 * self.span / n_strips
-        rho = aircraft.cruise_conditions.rho
-        v = aircraft.cruise_conditions.velocity
-        m = aircraft.cruise_conditions.mach
+        rho = fc.rho
+        v = fc.velocity
+        m = fc.mach
+
         if m < .5 or aircraft.sref == 0:
             return 0
 

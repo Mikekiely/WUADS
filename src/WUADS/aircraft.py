@@ -277,7 +277,7 @@ class Aircraft:
         for comp in self.aero_components.values():
             comp.parasite_drag(fc, self.sref, self)
             cd0 += comp.cd0
-            cdw += comp.set_wave_drag(self)
+            cdw += comp.set_wave_drag(self, flight_conditions=fc)
         return cd0, cdw
 
     def set_weight(self, wdg_guess=None, fudge_factor=1.06, reference_weight=None, components_changed=None):
