@@ -129,8 +129,6 @@ def run_AVL(fc, ac, cd0=None, cdw=None):
                 "st\n"
                 f"{derivs_file}\n\n"
                 "Quit\n\n")
-
-    print(commands)
     # Run avl
 
     try:
