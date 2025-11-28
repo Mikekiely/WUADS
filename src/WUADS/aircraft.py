@@ -306,6 +306,7 @@ class Aircraft:
             wdg_guess = reference_weight
             self.reference_weight = reference_weight
         elif self.reference_weight:
+            reference_weight = self.reference_weight
             wdg_guess = self.reference_weight
 
 
