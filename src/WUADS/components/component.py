@@ -148,7 +148,7 @@ class PhysicalComponent(Component):
         else:
             self.cd0 = cf * form_factor * self.Q * self.s_wet / sref
 
-    def set_wave_drag(self, aircraft):
+    def set_wave_drag(self, aircraft, flight_conditions=None):
         """
         Sets the wave drag to zero.
 

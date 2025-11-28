@@ -104,7 +104,7 @@ class Horizontal(Wing):
             self.weight_nasa = .016 * self.area ** .873 * (aircraft.ultimate_load * wdg) ** .414 * q ** .122
             return self.weight_nasa
 
-    def set_wave_drag(self, aircraft):
+    def set_wave_drag(self, aircraft, flight_conditions):
         """
         Set the wave drag to zero.
 
