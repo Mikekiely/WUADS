@@ -74,9 +74,9 @@ class Wing(PhysicalComponent):
         winglet = params.get('winglet', None)
         if winglet is not None:
             section1 = self.avl_sections[1]
-            sweep = winglet['sweep']
+            sweep = winglet['sweep'] * np.pi / 180
             height = winglet['height']
-            dihedral = winglet['dihedral']
+            dihedral = winglet['dihedral'] * np.pi / 180
             ct_wl = winglet['ct']
             self.avl_sections.append([section1[0] + np.tan(sweep) * height, section1[1] + height / np.tan(dihedral), section1[2] + height, ct_wl, 0])
 
