@@ -16,6 +16,7 @@ from .components.aerobodies.horizontal import Horizontal
 from .components.aerobodies.vertical import Vertical
 from .components.aerobodies.engine import Engine
 from .components.aerobodies.wing_advanced import Wing_advanced
+from .components.aerobodies.wing_yehudi import Wing_Yehudi
 
 AEROBODY_CLASSES = {
     "wing": Wing,
@@ -24,6 +25,7 @@ AEROBODY_CLASSES = {
     "vertical": Vertical,
     "engine": Engine,
     "wing_advanced": Wing_advanced,
+    "wing_yehudi": Wing_Yehudi
 }
 
 import logging
@@ -164,10 +166,10 @@ class Aircraft:
 
                 if 'title' not in params:
                     params['title'] = component_type
-                try:
-                    self.aero_components[params['title']] = component_class(params)
-                except TypeError:
-                    logger.warning(f'Component type {component_type} not found, the valid component types are as follows: {AEROBODY_CLASSES.keys()}')
+                # try:
+                self.aero_components[params['title']] = component_class(params)
+                # except TypeError:
+                #     logger.warning(f'Component type {component_type} not found, the valid component types are as follows: {AEROBODY_CLASSES.keys()}')
 
             # Set subsystem parameters for weight estimation
             subsystem_parameters = {}

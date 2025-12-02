@@ -126,7 +126,7 @@ class Wing_advanced(Wing):
             self.airfoil.append(self.airfoil[-1])
         while len(self.twist) < len(self.sections):
             self.twist.append(self.twist[-1])
-        self.create_sections()
+        self.create_avl_sections()
 
     def create_avl_sections(self):
         self.avl_sections = [[self.xle, self.yle, self.zle, self.cr, self.twist[0]]]
