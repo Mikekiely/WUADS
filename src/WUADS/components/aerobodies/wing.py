@@ -134,10 +134,42 @@ class Wing(PhysicalComponent):
         sweep = self.sweep_quarter_chord
         l_char = self.cref
 
-        # From Raymer
-        form_factor = ((1 + tc * .6 / xc + 100 * tc ** 4) * (1.34 * mach ** .18 * (np.cos(sweep)) ** .28))
-        # TODO Add shevell method
-        super().parasite_drag(form_factor, l_char, flight_conditions, sref)
+        n_strips = 40
+        cd0 = 0
+        for i in range(len(self.avl_sections)-1):
+            span = self.avl_sections[i+1][1] - self.avl_sections[i][1]
+            if span == 0 :
+                span = self.avl_sections[i+1][2] - self.avl_sections[i][2]
+
+            n_strips_section = round(n_strips * (span / self.span))
+            dy = self.span / n_strips_section
+
+            cr = self.avl_sections[i][3]
+            ct = self.avl_sections[i+1][3]
+            chords = np.linspace(cr, ct, n_strips_section+1)
+
+            dx = self.avl_sections[i+1][0] - self.avl_sections[i][0]
+            sweep = np.arctan(dx/span)
+
+            t = ct / cr
+            l_char = cr * (2 / 3) * ((1 + t + t ** 2) / (1 + t))
+
+            # Airfoil thickness
+            if isinstance(self.tc, list):
+                if (i+2) > len(self.tc):
+                    tc = np.linspace(self.tc[-1], self.tc[-1], n_strips_section)
+                else:
+                    tc = np.linspace(self.tc[i], self.tc[i+1], n_strips_section)
+            else:
+                tc = np.linspace(self.tc, self.tc, n_strips_section)
+
+            for i in range(n_strips_section):
+                # From Raymer
+                form_factor = ((1 + tc[i] * .6 / xc + 100 * tc[i] ** 4) * (1.34 * mach ** .18 * (np.cos(sweep)) ** .28))
+                area = .5 * (chords[i] + chords[i+1]) * dy
+
+                # TODO Add shevell method
+                self.cd0 += super().parasite_drag(form_factor, l_char, flight_conditions, sref) * area / sref
 
     def set_wave_drag(self, aircraft, flight_conditions=None):
         """
@@ -154,10 +186,18 @@ class Wing(PhysicalComponent):
         if fc is None:
             fc = aircraft.cruise_conditions
 
-
         # split wing into strips
         n_strips = 20
-        chords = np.linspace(self.cr, self.ct, n_strips+1)
+        chords = np.linspace(self.cr, self.ct, n_strips + 1)
+        chords = []
+
+        y_dist = np.linspace(self.yle, self.yle + self.span / 2, n_strips)
+
+        for i in range(len(self.avl_sections) - 1):
+            chords_i = np.linspace(self.avl_sections[i][3], self.avl_sections[i + 1][3], n_strips+1)
+            for c in chords_i:
+                chords.append(c)
+
         dy = .5 * self.span / n_strips
         rho = fc.rho
         v = fc.velocity
@@ -169,12 +209,12 @@ class Wing(PhysicalComponent):
         # Eliptical lift distribution equations
         lift = aircraft.weight_takeoff * .99
         gamma_0 = lift / (.25 * np.pi * v * rho * self.span)
-        y_dist = np.linspace(self.yle, self.yle + self.span/2, n_strips)
+
 
         cdw = 0
         for i in range(n_strips):
             cr_i = chords[i]
-            ct_i = chords[i+1]
+            ct_i = chords[i + 1]
             c = .5 * (cr_i + ct_i)
             area = .5 * (cr_i + ct_i) * dy
 
@@ -183,7 +223,7 @@ class Wing(PhysicalComponent):
             lprime = rho * v * gamma
             cl = lprime / (.5 * rho * v ** 2 * c)
             # Find the drag divergence number
-            ka = .95        # TODO make an input to change the airfoil type
+            ka = .95  # TODO make an input to change the airfoil type
             cos = np.cos(self.sweep_mid)
             mdd = (ka - cl / (10 * cos ** 2) - self.tc / cos) / cos
             mcr = mdd - .1077217
