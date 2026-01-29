@@ -207,12 +207,12 @@ class Wing(PhysicalComponent):
         cdw = 0
 
         for i in range(len(self.avl_sections) - 1):
-            span = self.avl_sections[i + 1][1] - self.avl_sections[i][1]
+            span = (self.avl_sections[i + 1][1] - self.avl_sections[i][1])
             if span == 0:
                 span = self.avl_sections[i + 1][2] - self.avl_sections[i][2]
 
-            n_strips_section = round(n_strips * (span / self.span))
-            dy = self.span / n_strips_section
+            n_strips_section = round(n_strips * (span / span))
+            dy = span / n_strips_section
 
             cr = self.avl_sections[i][3]
             ct = self.avl_sections[i + 1][3]
@@ -221,7 +221,7 @@ class Wing(PhysicalComponent):
             dx = self.avl_sections[i + 1][0] - self.avl_sections[i][0]
             sweep = np.arctan(dx / span)
             yle = self.avl_sections[i][1]
-            y_dist = np.linspace(yle, yle + span/2, n_strips)
+            y_dist = np.linspace(yle, yle + span, n_strips)
 
             for j in range(n_strips_section):
                 cr_i = chords[j]
