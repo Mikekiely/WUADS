@@ -169,7 +169,7 @@ class Wing(PhysicalComponent):
                 area = .5 * (chords[i] + chords[i+1]) * dy
 
                 # TODO Add shevell method
-                self.cd0 += super().parasite_drag(form_factor, l_char, flight_conditions, sref) * area / sref
+                self.cd0 += 2 * super().parasite_drag(form_factor, l_char, flight_conditions, sref) * area / sref
 
     def set_wave_drag(self, aircraft, flight_conditions=None):
         """
