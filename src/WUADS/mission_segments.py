@@ -39,6 +39,8 @@ class MissionSegment:
 
         self.power_required = 0
         self.power_required_kw = 0
+
+  
         pass
 
     def breguet_range(self, aircraft, wi):
@@ -64,6 +66,7 @@ class takeoff(MissionSegment):
 
 
         thrust = self.thrust_setting * aircraft.propulsion.max_thrust
+
         self.sfc, self.max_thrust = aircraft.propulsion.analyze_performance(
                 self.altitude, self.mach, self.thrust
             )
@@ -232,6 +235,7 @@ class cruise(MissionSegment):
         run_AVL(self.flight_conditions, aircraft)
         self.cl, self.cd = import_coefficients(aircraft, self)
         self.lift_to_drag = self.cl / self.cd
+
         self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.flight_conditions.altitude,
                                                                       self.flight_conditions.mach,
                                                                       self.thrust)

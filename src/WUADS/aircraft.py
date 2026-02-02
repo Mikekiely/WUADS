@@ -7,7 +7,7 @@ from .components.component import Component
 from .components.subsystems import Subsystems
 from .mission import Mission
 from .components.usefulload import UsefulLoad
-from .propulsion import turbofan, propeller
+from .propulsion import turbofan, propeller, turboprop
 from .mission_segments import *
 from .flight_conditions import FlightConditions
 from .components.aerobodies.wing import Wing
@@ -246,6 +246,18 @@ class Aircraft:
                 horse_power=horse_power,
                 fuel_consumption_rate=fuel_consumption_rate
             )
+        elif engine_type.lower() == 'turboprop':
+            horse_power = kwargs.get('horse_power', None)
+            sfc_lb_per_hph = kwargs.get('sfc_lb_per_hph', None)
+            if not horse_power:
+                logger.warning('Please enter a base horsepower for turboprop engine')
+            if not sfc_lb_per_hph:
+                logger.warning('Please enter a sfc for turboprop engine')
+            engine = turboprop(
+                n_engines=n_engines,
+                horse_power=horse_power,
+                sfc_lb_per_hph= sfc_lb_per_hph
+            )
 
 
         if set_engine:
@@ -260,6 +272,10 @@ class Aircraft:
         # https://arc.aiaa.org/doi/abs/10.2514/1.47557
 
         cd0, cdw = self.get_cd0()
+        # parasite drag penalty for turboprop
+        if self.propulsion.engine_type == 'turboprop':
+            cd0 = cd0 * 1.7
+            print('drag penalty applied')
         self.cd0 = cd0
         self.cdw = cdw
 
@@ -277,6 +293,10 @@ class Aircraft:
         for comp in self.aero_components.values():
             comp.parasite_drag(fc, self.sref, self)
             cd0 += comp.cd0
+            #parasite drag penalty for turboprop
+            # if self.propulsion.engine_type == 'turboprop':
+            #     cd0 += comp.cd0 * 1.8
+
             cdw += comp.set_wave_drag(self)
         return cd0, cdw
 

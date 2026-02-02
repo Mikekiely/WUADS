@@ -96,7 +96,7 @@ class Wing(PhysicalComponent):
         self.taper = 0  # Taper Ratio
         self.cr = 0  # Root Chord
         self.ct = 0  # Tip Chord
-        self.Q = 1  # interference factor
+        self.Q = 1   # interference factor
         self.laminar_percent = .1  # Percentage of laminar flow
         self.dihedral = 0  # Dihedral angle (rad)
         self.dihedral_deg = 0  # Dihedral angle (deg)

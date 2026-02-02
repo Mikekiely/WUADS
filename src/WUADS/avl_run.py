@@ -94,7 +94,7 @@ def run_AVL(fc, ac, cd0=None, cdw=None):
         cdw = ac.cdw
 
     output_dir = ac.output_dir
-    derivs_file = os.path.join(output_dir, 'derivs.dat')
+    derivs_file = os.path.join(output_dir, 'derivs')
 
     # Conversion Factors
     slg2kgm = 515.379
@@ -130,6 +130,7 @@ def run_AVL(fc, ac, cd0=None, cdw=None):
                 "st\n"
                 f"{derivs_file}\n\n"
                 "Quit\n\n")
+
     # Run avl
     try:
         process = subprocess.run(['avl'],
@@ -143,7 +144,7 @@ def run_AVL(fc, ac, cd0=None, cdw=None):
 
 # Imports lift and drag coefficients from output derivs.st file
 def import_coefficients(ac, seg):
-    derivs_file = os.path.join(ac.output_dir, 'derivs.dat')
+    derivs_file = os.path.join(ac.output_dir, 'derivs')
     try:
         with open(derivs_file, 'r') as fid:
             derivs = fid.readlines()[23:25]
