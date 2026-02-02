@@ -119,14 +119,12 @@ def run_AVL(fc, ac, cd0=None, cdw=None, aoa=None, hide_output=True):
              f"MSET\n"
              "0\n"
              "Oper\n"
-             "M\n"
-             "a\n"
-             f"{aoa}\n"
+             f"a a {aoa}\n"
              f"D1 PM 0\n"
              f"M\n"
              f"MN {M}\n"
-             f"CD {Cd0}\n\n"
-             f"V {V}\n\n"
+             f"CD {Cd0}\n"
+             f"V {V}\n"
              f"D {fc.rho * slg2kgm}\n"
              "G 9.81\n\n"
              "x\n"
@@ -153,16 +151,17 @@ def run_AVL(fc, ac, cd0=None, cdw=None, aoa=None, hide_output=True):
                     f"{derivs_file}\n\n"
                     "Quit\n\n")
     # Run avl
-
     try:
         if hide_output:
-            process = subprocess.run(['avl'],
+            process = subprocess.run(['./avl'],
                                      input=commands.encode(),
                                      stdout=subprocess.DEVNULL,
+                                     shell=True
                                      )
         else:
-            process = subprocess.run(['avl'],
-                                     input=commands.encode()
+            process = subprocess.run(['./avl'],
+                                     input=commands.encode(),
+                                     shell=True
                                      )
 
 
