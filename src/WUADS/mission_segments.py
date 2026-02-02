@@ -97,6 +97,11 @@ class climb(MissionSegment):
         self.max_thrust = 0
         self.K = 0
         self.title = title
+        self.aoa = None
+        self.set_aoa = True
+        if 'aoa' in kwargs:
+            self.set_aoa = True
+
         self.__dict__.update(kwargs)
         self.start_velocity = start_velocity
         self.end_velocity = end_velocity
@@ -133,8 +138,13 @@ class climb(MissionSegment):
             weight = wn
 
         if self.run_sim:
+            if self.set_aoa:
+                aoa = self.aoa
+            else:
+                aoa = None
+
             AVL_input(aircraft, aircraft.weight_takeoff, mach=self.mach)
-            run_AVL(self.flight_conditions, aircraft, cd0=cd0, cdw=cdw)
+            run_AVL(self.flight_conditions, aircraft, cd0=cd0, cdw=cdw, aoa=aoa, hide_output=True)
 
             self.cl, self.cd = import_coefficients(aircraft, self)
         else:
@@ -159,27 +169,24 @@ class climb(MissionSegment):
         sref = aircraft.sref
         D = self.cd * q * sref
         self.thrust = D
-        delta_he = (self.end_altitude + 1 / (2 * g) * self.end_velocity ** 2) - (1 / (2 * g) * self.start_velocity ** 2)
+        delta_he = ((self.end_altitude + 1 / (2 * g) * self.end_velocity ** 2) -
+                    (self.start_altitude + (1 / (2 * g) * self.start_velocity ** 2)))
 
         self.sfc, max_thrust = aircraft.propulsion.analyze_performance(self.altitude, self.flight_conditions.mach)
 
         self.max_thrust = max_thrust
 
+
+
         ps = self.flight_conditions.velocity * (max_thrust - D) / weight
-
-        fs = ps / (max_thrust * self.sfc/3600)
-        self.fuel_burnt = delta_he / fs
         self.time = delta_he / ps
-
-        # self.weight_fraction = np.exp(
-        # -(self.sfc / 3600) * delta_he / (self.velocity * (1 - D / max_thrust)))
         climb_angle = np.arcsin(max_thrust / weight - D / weight)
+
+        climb_angle = np.arcsin(max_thrust/weight - 1 / self.lift_to_drag)
+
         rate_of_climb = self.velocity * np.sin(climb_angle)
         self.rate_of_climb = rate_of_climb
-        # self.time = (self.end_altitude - self.start_altitude) / rate_of_climb
-        self.range = self.velocity * self.time / 6076.12
-        # self.fuel_burnt = self.sfc * D * self.time
-        # self.fuel_burnt = self.max_thrust * self.sfc * self.time
+        self.fuel_burnt = (self.sfc/3600) * self.max_thrust * self.time
 
         if wn:
             wi = wn + self.fuel_burnt

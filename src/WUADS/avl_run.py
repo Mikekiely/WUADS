@@ -86,7 +86,7 @@ def AVL_input(ac, w, mach=None):
 
 
 # runs specified case and saves results in derivs.st file
-def run_AVL(fc, ac, cd0=None, cdw=None):
+def run_AVL(fc, ac, cd0=None, cdw=None, aoa=None, hide_output=True):
 
     if cd0 is None:
         cd0 = ac.cd0
@@ -113,30 +113,59 @@ def run_AVL(fc, ac, cd0=None, cdw=None):
     if os.path.exists(derivs_file):
         os.remove(derivs_file)
 
-    commands = (f"LOAD {geom_file}\n"
-                f"Mass {mass_file}\n"
-                f"MSET\n"
-                "0\n"
-                "Oper\n"
-                "C1\n"
-                "G 9.81\n"
-                f"D {fc.rho * slg2kgm}\n"
-                f"V {V}\n\n"
-                "D1 PM 0\n"
-                "M\n"
-                f"MN {M}\n"
-                f"CD {Cd0}\n\n"
-                "x\n"
-                "st\n"
-                f"{derivs_file}\n\n"
-                "Quit\n\n")
-
+    if aoa is not None:
+        commands = (
+             f"LOAD {geom_file}\n"
+             f"Mass {mass_file}\n"
+             f"MSET\n"
+             "0\n"
+             "Oper\n"
+             f"a a {aoa}\n"
+             f"D1 PM 0\n"
+             f"M\n"
+             f"MN {M}\n"
+             f"CD {Cd0}\n"
+             f"V {V}\n"
+             f"D {fc.rho * slg2kgm}\n"
+             "G 9.81\n\n"
+             "x\n"
+             "st\n"
+             f"{derivs_file}\n\n"
+             "Quit\n\n"
+        )
+    else:
+        commands = (f"LOAD {geom_file}\n"
+                    f"Mass {mass_file}\n"
+                    f"MSET\n"
+                    "0\n"
+                    "Oper\n"
+                    "C1\n"
+                    "G 9.81\n"
+                    f"D {fc.rho * slg2kgm}\n"
+                    f"V {V}\n\n"
+                    "D1 PM 0\n"
+                    "M\n"
+                    f"MN {M}\n"
+                    f"CD {Cd0}\n\n"
+                    "x\n"
+                    "st\n"
+                    f"{derivs_file}\n\n"
+                    "Quit\n\n")
     # Run avl
     try:
-        process = subprocess.run(['avl'],
-                                 input=commands.encode(),
-                                  stdout=subprocess.DEVNULL,
-                                  )
+        if hide_output:
+            process = subprocess.run(['./avl'],
+                                     input=commands.encode(),
+                                     stdout=subprocess.DEVNULL,
+                                     shell=True
+                                     )
+        else:
+            process = subprocess.run(['./avl'],
+                                     input=commands.encode(),
+                                     shell=True
+                                     )
+
+
     except FileNotFoundError:
         logger.error('AVL.exe file not found, please add to working directory or add avl to environment variables')
         sys.exit(1)
@@ -145,6 +174,7 @@ def run_AVL(fc, ac, cd0=None, cdw=None):
 # Imports lift and drag coefficients from output derivs.st file
 def import_coefficients(ac, seg):
     derivs_file = os.path.join(ac.output_dir, 'derivs')
+
     try:
         with open(derivs_file, 'r') as fid:
             derivs = fid.readlines()[23:25]

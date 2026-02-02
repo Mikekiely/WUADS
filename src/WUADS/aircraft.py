@@ -7,7 +7,7 @@ from .components.component import Component
 from .components.subsystems import Subsystems
 from .mission import Mission
 from .components.usefulload import UsefulLoad
-from .propulsion import turbofan, propeller, turboprop
+from .propulsion import turbofan, propeller
 from .mission_segments import *
 from .flight_conditions import FlightConditions
 from .components.aerobodies.wing import Wing
@@ -16,6 +16,7 @@ from .components.aerobodies.horizontal import Horizontal
 from .components.aerobodies.vertical import Vertical
 from .components.aerobodies.engine import Engine
 from .components.aerobodies.wing_advanced import Wing_advanced
+from .components.aerobodies.wing_yehudi import Wing_Yehudi
 
 AEROBODY_CLASSES = {
     "wing": Wing,
@@ -24,6 +25,7 @@ AEROBODY_CLASSES = {
     "vertical": Vertical,
     "engine": Engine,
     "wing_advanced": Wing_advanced,
+    "wing_yehudi": Wing_Yehudi
 }
 
 import logging
@@ -297,7 +299,8 @@ class Aircraft:
             # if self.propulsion.engine_type == 'turboprop':
             #     cd0 += comp.cd0 * 1.8
 
-            cdw += comp.set_wave_drag(self)
+
+            cdw += comp.set_wave_drag(self, flight_conditions=fc)
         return cd0, cdw
 
     def set_weight(self, wdg_guess=None, fudge_factor=1.06, reference_weight=None, components_changed=None):
@@ -326,6 +329,7 @@ class Aircraft:
             wdg_guess = reference_weight
             self.reference_weight = reference_weight
         elif self.reference_weight:
+            reference_weight = self.reference_weight
             wdg_guess = self.reference_weight
 
 

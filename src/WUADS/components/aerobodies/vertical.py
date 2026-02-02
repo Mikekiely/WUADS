@@ -140,7 +140,7 @@ class Vertical(Wing):
 
         self.inertia = [x * self.weight for x in self.cg]
 
-    def set_wave_drag(self, aircraft):
+    def set_wave_drag(self, aircraft, flight_conditions):
         """
         Set the wave drag of the vertical stabilizer to zero.
 

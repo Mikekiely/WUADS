@@ -146,12 +146,10 @@ class PhysicalComponent(Component):
         if sref == 0:
             return 0
         else:
-            self.cd0 = (cf * form_factor * self.Q * self.s_wet / sref)
-            # for turbo-prop (parasite drag penalty)
+            self.cd0 = cf * form_factor * self.Q * self.s_wet / sref
+            return self.cd0
 
-
-
-    def set_wave_drag(self, aircraft):
+    def set_wave_drag(self, aircraft, flight_conditions=None):
         """
         Sets the wave drag to zero.
 
