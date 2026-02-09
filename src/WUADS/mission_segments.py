@@ -197,6 +197,9 @@ class climb(MissionSegment):
         self.wi = wi
         self.wn = wn
         self.fuel_burnt = self.wi - self.wn
+        if self.fuel_burnt < 0:
+            print()
+        self.range = self.flight_conditions.velocity * self.time * 0.000164579
 
 
 class cruise(MissionSegment):
