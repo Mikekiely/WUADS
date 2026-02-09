@@ -153,13 +153,13 @@ def run_AVL(fc, ac, cd0=None, cdw=None, aoa=None, hide_output=True):
     # Run avl
     try:
         if hide_output:
-            process = subprocess.run(['./avl'],
+            process = subprocess.run(['avl'],
                                      input=commands.encode(),
                                      stdout=subprocess.DEVNULL,
                                      shell=True
                                      )
         else:
-            process = subprocess.run(['./avl'],
+            process = subprocess.run(['avl'],
                                      input=commands.encode(),
                                      shell=True
                                      )
