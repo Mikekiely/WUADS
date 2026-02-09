@@ -109,6 +109,7 @@ def run_AVL(fc, ac, cd0=None, cdw=None, aoa=None, hide_output=True):
     a = fc.a * ft2m
     V = M * a
 
+    # %% XFOIL input file writer
     if os.path.exists(derivs_file):
         os.remove(derivs_file)
 

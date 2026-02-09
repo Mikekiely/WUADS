@@ -166,10 +166,10 @@ class Aircraft:
 
                 if 'title' not in params:
                     params['title'] = component_type
-                # try:
-                self.aero_components[params['title']] = component_class(params)
-                # except TypeError:
-                #     logger.warning(f'Component type {component_type} not found, the valid component types are as follows: {AEROBODY_CLASSES.keys()}')
+                try:
+                    self.aero_components[params['title']] = component_class(params)
+                except TypeError:
+                    logger.warning(f'Component type {component_type} not found, the valid component types are as follows: {AEROBODY_CLASSES.keys()}')
 
             # Set subsystem parameters for weight estimation
             subsystem_parameters = {}
@@ -248,6 +248,18 @@ class Aircraft:
                 horse_power=horse_power,
                 fuel_consumption_rate=fuel_consumption_rate
             )
+        elif engine_type.lower() == 'turboprop':
+            horse_power = kwargs.get('horse_power', None)
+            sfc_lb_per_hph = kwargs.get('sfc_lb_per_hph', None)
+            if not horse_power:
+                logger.warning('Please enter a base horsepower for turboprop engine')
+            if not sfc_lb_per_hph:
+                logger.warning('Please enter a sfc for turboprop engine')
+            engine = turboprop(
+                n_engines=n_engines,
+                horse_power=horse_power,
+                sfc_lb_per_hph= sfc_lb_per_hph
+            )
 
 
         if set_engine:
@@ -262,6 +274,10 @@ class Aircraft:
         # https://arc.aiaa.org/doi/abs/10.2514/1.47557
 
         cd0, cdw = self.get_cd0()
+        # parasite drag penalty for turboprop
+        if self.propulsion.engine_type == 'turboprop':
+            cd0 = cd0 * 1.7
+            print('drag penalty applied')
         self.cd0 = cd0
         self.cdw = cdw
 
@@ -279,6 +295,11 @@ class Aircraft:
         for comp in self.aero_components.values():
             comp.parasite_drag(fc, self.sref, self)
             cd0 += comp.cd0
+            #parasite drag penalty for turboprop
+            # if self.propulsion.engine_type == 'turboprop':
+            #     cd0 += comp.cd0 * 1.8
+
+
             cdw += comp.set_wave_drag(self, flight_conditions=fc)
         return cd0, cdw
 

@@ -33,7 +33,7 @@ class Engine(PhysicalComponent):
 
         self._n_engines = 2  # Number of engines
         self.w_engine = 0    # Weight of each engine
-        self.engine_type = 'turbofan'        # 'Turbofan' or 'Propeller'
+        self.engine_type = 'turbofan'        # 'Turbofan' or 'Propeller' or 'turboprop'
 
         self.weight_nacelle = 0
         self.weight_controls = 0
@@ -54,6 +54,11 @@ class Engine(PhysicalComponent):
         l_char = self.length
         f = self.length / self.diameter
         form_factor = 1 + .35/f * self.n_engines     # From Raymer
+
+        # for turbo-prop larger engine (more drag)
+        if self.engine_type == "turboprop":
+            form_factor = form_factor * 1.35
+
 
         super().parasite_drag(form_factor, l_char, flight_conditions, sref)
 
@@ -137,6 +142,10 @@ class Engine(PhysicalComponent):
                                   wec ** .611 * self.n_engines**.984 * self.s_wet ** .224
             self.weight_nacelle = self.weight_raymer
         elif self.engine_type == 'propeller':
+            self.weight_raymer = self.w_engine ** .922 * self.n_engines
+            self.weight_nacelle = self.weight_raymer
+        #might need to fix
+        elif self.engine_type == 'turboprop':
             self.weight_raymer = self.w_engine ** .922 * self.n_engines
             self.weight_nacelle = self.weight_raymer
         return self.weight_raymer

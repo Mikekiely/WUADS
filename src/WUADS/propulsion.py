@@ -4,6 +4,7 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment
 from .flight_conditions import FlightConditions
 import numpy as np
+
 logger = logging.getLogger(__name__)
 
 
@@ -371,6 +372,7 @@ class propeller(engine):
         #efficiency calculation
         nu_propeller = self.prop_efficiency(mach)
 
+
         #altitude horsepower correction equation 14.5 from Nicolai
         rho = fc.rho  # air density at altitude (slugs/ft^3 if imperial)
         rho_sl = 0.0023769  # sea-level density, slugs/ft^3
@@ -382,7 +384,7 @@ class propeller(engine):
         P_generated = total_horse_power * 550  # horsepower to ft-lb/s
         P_available = nu_propeller * P_generated
 
-        fuel_density = 6.2  # lbs/gal (Avgas density adjusted slightly for temperature differences)
+        fuel_density = 6.8  # lbs/gal (6.8 for Avgas density adjusted slightly for temperature differences)
         total_fuel_consumption = self.n_engines * self.current_fuel_consumption_rate  # gal/hr
         fuel_mass_flow_rate_lb_per_hr = total_fuel_consumption * fuel_density  # lbs/hr
 
@@ -403,6 +405,10 @@ class propeller(engine):
 
 
         return sfc, max_thrust
+
+
+
+
 
     # alernative method from section 3.1: https://www.fzt.haw-hamburg.de/pers/Scholz/transfer/Airport2030_TN_Propeller-Efficiency_13-08-12_SLZ.pdf
     @staticmethod
@@ -426,3 +432,129 @@ class propeller(engine):
 
         return nu_propeller
 
+class turboprop(engine):
+    """
+    Standard turboprop engine performance model.
+    Inputs:
+        - n_engines: number of engines
+        - horse_power: rated horsepower at sea level (hp)
+        - sfc_lb_per_hph: specific fuel consumption (lb/hph)
+    """
+
+    def __init__(self, n_engines=1, horse_power=None, sfc_lb_per_hph=None):
+        super().__init__(n_engines)
+        self.horse_power = horse_power
+        self.current_horse_power = horse_power
+        self.sfc_lb_per_hph = sfc_lb_per_hph
+        self.engine_type = 'turboprop'
+
+    def analyze_performance(self, height, mach, thrust_required=None):
+        """
+        Calculates the maximum thrust and SFC (lb/lbf·hr)
+        based on power, altitude, and Mach number.
+        """
+
+
+        # Flight conditions and velocity (ft/s)
+        fc = FlightConditions(height, mach)
+        V = mach * fc.a  # ft/s
+
+        # Propeller efficiency
+        nu_turboprop = self.turboprop_efficiency(mach, height)
+        #nu_turboprop = .9
+
+        # Altitude horsepower correction (Eq. 14.5 from Nicolai)
+        rho = fc.rho  # air density at altitude (slugs/ft^3)
+        rho_sl = 0.0023769  # sea-level density (slugs/ft^3)
+        Bhp_sl = self.horse_power
+
+        # Available horsepower at altitude
+        Bhp_h = Bhp_sl * (rho / rho_sl - (1 - rho / rho_sl) / 7.75)
+        total_horse_power = self.n_engines * Bhp_h
+
+        # Convert horsepower to ft-lb/s
+        P_generated = total_horse_power * 550.0
+        P_available = nu_turboprop * P_generated
+
+        # Convert SFC (lb/hph) → total fuel flow (lb/hr)
+        total_fuel_consumption_lb_per_hr = (self.sfc_lb_per_hph * total_horse_power)
+
+        # Handle static or very low-speed case
+        if V <= 1e-3 or np.isnan(V):
+            # Static thrust approximation
+            static_thrust_factor = 2.5  # lbf per hp (typical estimate)
+            max_thrust = total_horse_power * static_thrust_factor
+            sfc = total_fuel_consumption_lb_per_hr / (max_thrust + 1e-6)  # lb/(lb·hr)
+        else:
+            # Thrust from available power
+            max_thrust = P_available / V  # lbf
+            # if fc.altitude > 20000:
+            #     max_thrust = max_thrust * 1.3
+            sfc = total_fuel_consumption_lb_per_hr / (max_thrust + 1e-6)  # lb/(lbf·hr)
+
+
+
+
+        # Store results
+        self.max_thrust = max_thrust
+
+        return sfc, max_thrust
+
+
+    @staticmethod
+    def turboprop_efficiency(mach, height):
+        # altitude_m = height * 0.3048
+        #
+        # # Temperature model (approximate ISA up to 20 km)
+        # if altitude_m <= 11000:
+        #     T = 288.15 - 0.0065 * altitude_m  # K
+        # else:
+        #     T = 216.65  # K (constant above tropopause)
+        #
+        # # Speed of sound (m/s)
+        # a = (1.4 * 287.05 * T) ** 0.5
+        #
+        # # Convert to mph (1 m/s = 2.23694 mph)
+        # speed_mph = mach * a * 2.23694
+        #
+        # if speed_mph <250 and speed_mph<400:
+        #     nu_turboprop = .9
+        #     print('here')
+        # else:
+        #     nu_turboprop = .8
+        # Base efficiency for low Mach
+        # eta_base = 0.8
+        # M0 = 0.3  # threshold Mach number
+        # kM = 1.2  # degradation factor per unit Mach
+        # kh = 0.05  # altitude correction factor
+        #
+        # # Degrade efficiency above M0 linearly
+        # if mach <= M0:
+        #     eta = eta_base
+        # else:
+        #     eta = eta_base * max(0.5, 1.0 - kM * (mach - M0))  # don’t drop below 50% of base
+        #
+        # # Apply altitude correction
+        # eta *= (1.0 - kh * (height / 50000.0))
+        #
+        # # Bound the result between 0.4 and 0.99
+        # nu_turboprop = max(0.4, min(0.99, eta))
+        nu_max = 0.9  # can adjust
+
+        if mach <= 0.1:
+            nu_turboprop = 10 * mach * nu_max
+
+
+        elif .1 < mach <= 0.7:
+            nu_turboprop = nu_max
+
+        elif .7 < mach < 0.85:
+            nu_turboprop = 10 * mach * nu_max * (1 - (mach - 0.7) / 3)
+
+        else:
+            nu_turboprop = max(0.0, 10 * mach * nu_max * (
+                        1 - (mach - 0.7) / 3))  # prevent negative (just sets to 0 if negative)
+
+
+
+        return nu_turboprop
