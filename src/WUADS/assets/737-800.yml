@@ -1,5 +1,3 @@
-Units: Imperial       # "SI" or "Imperial"
-
 aircraft:
   title: 'b737-800'         # Used for output file prefix
   altitude: 35000           # Altitude at cruise
@@ -36,6 +34,7 @@ components:
     # Optional Inputs
     laminar_percent: .1         # Percentage of chord experiencing laminar flow
     control_surface_ratio: .1   # Percentage of the chord which has a control surface (used for weights
+    airfoil_thickness: [.12, .07]
 
   horizontal:
     title: 'Horizontal Stabilizer'
@@ -133,7 +132,7 @@ mission_profile:
   climb_1:
     run_sim: True
     segment_type: climb
-    start_velocity: 421
+    start_velocity: 100
     end_velocity: 421
     start_altitude: 100
     end_altitude: 10000
@@ -141,16 +140,17 @@ mission_profile:
     run_sim: True
     segment_type: climb
     start_velocity: 421
-    end_velocity: 879
+    end_velocity: 600
     start_altitude: 10000
-    end_altitude: 10000
+    end_altitude: 20000
   climb_3:
     run_sim: True
     segment_type: climb
-    start_velocity: 879
+    start_velocity: 600
     end_velocity: 778
-    start_altitude: 10000
+    start_altitude: 20000
     end_altitude: 35000
+    aoa: 1
   cruise:
     segment_type: cruise
     mach: .78
@@ -177,7 +177,7 @@ mission_profile:
     segment_type: cruise
     mach: .5003
     altitude: 20000
-    range: 200
+    range: 150
     find_range: False
   descent_2:
     segment_type: descent
@@ -193,6 +193,6 @@ mission_profile:
   landing:
     segment_type: landing
     weight_fraction: .995
-    reserve_fuel: .06
+    reserve_fuel: .05
 
 

@@ -146,7 +146,7 @@ def plot_wing(wing):
         yle_ar = np.linspace(wing.yle, wing.yle + b, n)
 
     scaled = False
-    if hasattr(wing, 'airfoil_thickness') and isinstance(wing.airfoil_thickness, list):
+    if len(wing.airfoil_thickness) >= 2:
         scale_factor = np.linspace((wing.airfoil_thickness[0] / .12), (wing.airfoil_thickness[1] / .12), n)
         scaled = True
 
