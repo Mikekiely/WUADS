@@ -30,7 +30,7 @@ class mission_profile_edit(QDialog):
             'takeoff': {'thrust_setting': 'Thrust Setting', 'time': 'time (s)'},
             'climb': {'start_velocity': 'Start Velocity (ft/s)', 'end_velocity': 'End Velocity (ft/s)',
                       'start_altitude': 'Start Altitude (ft)', 'end_altitude': 'End Altitude (ft)'},
-            'cruise': {'mach': 'Mach Number', 'altitude': 'Altitude (ft)', 'set_range': 'Set Range'},
+            'cruise': {'mach': 'Mach Number', 'altitude': 'Altitude (ft)', 'find_range': 'Find Range'},
             'descent': {'weight_fraction': 'Weight Fraction'},
             'loiter': {'altitude': 'Altitude', 'time': 'Time', 'mach': 'Mach'},
             'landing': {'weight_fraction': 'Weight Fraction', 'reserve_fuel_fraction': 'Reserve Fuel Fraction'}
