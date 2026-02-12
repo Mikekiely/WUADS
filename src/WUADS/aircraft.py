@@ -464,9 +464,6 @@ class Aircraft:
                     except:
                         pass
 
-                    if param.startswith('sweep') or param.startswith('dihedral'):
-                        val *= 180 / np.pi
-
                     params[param] = val
 
             component_list[comp.component_type] = params
@@ -482,7 +479,8 @@ class Aircraft:
                             'w_avionics': self.subsystems.parameters['w_avionics']
                             }
 
-        propulsion_params = {'thrust_sea_level': self.propulsion.thrust_sea_level,
+        propulsion_params = {'engine_type': self.propulsion.engine_type,
+                             'thrust_sea_level': self.propulsion.thrust_sea_level,
                              'thrust_cruise': self.propulsion.thrust_cruise,
                              'sfc_sea_level': self.propulsion.sfc_sea_level,
                              'sfc_cruise': self.propulsion.sfc_cruise}
