@@ -1,0 +1,198 @@
+aircraft:
+  title: 'b737-800'         # Used for output file prefix
+  altitude: 35000           # Altitude at cruise
+  mach: 0.78                 # Mach number at cruise
+  max_mach: .78           # Maximum mach number at cruise
+  ultimate_load: 4.5        # Ultimate Load Factor (g's)
+  w_fuel: 46000             # Fuel Weight
+  cg_fuel: [68, 0, 0]       # Fuel center of gravity (Optional)
+  rho_fuel: 6.8             # Fuel density (lbs/gal) (Optional)
+  n_passengers: 180         # number of passengers (Optional)
+  cg_passengers: [60, 0, 0]  # Center of gravity for passengers (Optional)
+  n_pilots: 2               # Number of pilots (Optional)
+  n_flight_attendants: 4    # Number of flight attendants (Optional)
+  cg_crew: [9, 0, 0]        # Center of gravity for the crew (Optional)
+  w_cargo: 15757            # Cargo Weight (Optional)
+  cg_cargo: [60, 0, 0]      # Center of gravity for cargo (Optional)
+  design_range: 2935        # Design range (nmi)
+  n_engines: 2              # number of engines
+
+components:
+  wing:
+    # Required Inputs
+    title: 'Main Wing'
+    area: 1340                  # Surface Area
+    span: 111                   # Wing Span
+    taper: 0.1581               # Wing Taper Ratio
+    sweep: 25.01                # Quarter Chord Sweep (deg)
+    sweep_location: .25
+    dihedral: 6                 # Dihedral Angle at root
+    xle: 42.4                   # X value at leading edge
+    yle: 0                      # Y value at leading edge
+    zle: -2.42                  # Z value at leading edge
+
+    # Optional Inputs
+    laminar_percent: .1         # Percentage of chord experiencing laminar flow
+    control_surface_ratio: .1   # Percentage of the chord which has a control surface (used for weights
+    airfoil_thickness: [.12, .07]
+
+  horizontal:
+    title: 'Horizontal Stabilizer'
+    span: 47.1
+    cr: 12.8
+    ct: 2.55
+    sweep: 34.407
+    sweep_location: 0
+    dihedral: 7
+    xle: 111
+    yle: 0
+    zle: 4.415
+    control_surface_ratio: .2
+
+  vertical:
+    title: 'Vertical Stabilizer'
+    span: 26.15
+    cr: 21.21
+    ct: 5.75
+    sweep: 40
+    dihedral: 90
+    xle: 109
+    yle: 0
+    zle: 6.66
+
+  fuselage:
+    # Required Inputs
+    title: 'Fuselage'
+    length: 124.75      # Fuselage length (ft)
+    width: 12.21        # Fuselage Width (ft)
+    height: 13.17       # Fuselage height (ft)
+
+    # Optional Inputs - Used only for weight calculations - These are the default values
+    kdoor: 1.0              # 1.0 for no cargo door, 1.06 if one side door, 1.12 if two side doors or clamshell door,
+                            # 1.25 if side doors and clamshell
+    fuse_mounted_lg: True   # True if landing gear is mounted to fuselage, False if not
+    pressurized_fuse: True  # Pressurized fuselage (True or False)
+    cargo_floor: False      # Does the fuselage have a cargo floor, true or false
+    wfw: None               # weight of fuel in wings (if None then all weight is in wings)
+
+
+  engine:
+    # Contains weight properties for engine, nacelle, and all propulsive subcomponents and drag properties for nacelle
+    # Required Inputs
+    title: 'Nacelle'
+    length: 10
+    diameter: 8
+    xle: 49.5
+    yle: 15.75
+    zle: -5
+    attachment: 'Main Wing'    # What component is this attached to - make sure it is the title of a component declared earlier
+    w_engine: 5216
+
+    # Optional Inputs
+    pylon_mounted: True # Is the nacelle mounted on a pylon or not (Optional)
+    thrust_reversal: False # (Optional)
+
+propulsion:
+  engine_type: 'turbofan'
+  thrust_sea_level: 24200
+
+subsystem_parameters:
+  subsystems: # Subsystems and their centers of gravity
+    nose_landing_gear: [15, 0, -6]
+    main_landing_gear: [69.3, 0, -6]
+    air_conditioning: [62, 0, 0]
+    anti_ice: [67, 0, 0]
+    apu: [121, 0, 0]                  # Auxiliary Power Unit
+    avionics: [9, 0, 0]
+    electronics: [12, 0, 0]
+    flight_controls: [0, 0, 0]        # cg calculated automatically
+    furnishings: [56, 0, 0]
+    hydraulics: [62, 0, 0]
+    instruments: [9, 0, 0]
+
+  # Landing gears
+  n_nose_wheels: 2    # Number of wheels on nose landing gear (Optional)
+  n_main_wheels: 4    # Number of wheels on main landing gear (Optional)
+  height: 6           # landing gear height (ft) (Optional)
+
+  # Fuel tanks
+  n_tanks: 3          # Total number of fuel tanks
+
+  w_avionics: 1200    # Weight of uninstalled avionics
+
+mission_profile:
+  takeoff_1:
+    segment_type: takeoff
+    thrust_setting: .15
+    time: 16              # Minutes
+  takeoff_2:
+    segment_type: takeoff
+    thrust_setting: 1
+    time: 1               # Minutes
+  climb_1:
+    run_sim: True         # Run AVL (makes analysis more accurate but takes longer)
+    segment_type: climb
+    start_velocity: 250   # ft/s
+    end_velocity: 421     # ft/s
+    start_altitude: 100   # ft
+    end_altitude: 10000   # ft
+  climb_2:
+    run_sim: True
+    segment_type: climb
+    start_velocity: 421
+    end_velocity: 600
+    start_altitude: 10000
+    end_altitude: 20000
+  climb_3:
+    run_sim: True
+    segment_type: climb
+    start_velocity: 600
+    end_velocity: 778
+    start_altitude: 20000
+    end_altitude: 35000
+    aoa: 1
+  cruise:
+    segment_type: cruise
+    mach: .78
+    altitude: 35000
+    find_range: True      # Do you want this section to maximize its range
+  descent:
+    segment_type: descent
+    weight_fraction: .995
+  climb_4:
+    run_sim: True
+    segment_type: climb
+    start_velocity: 421.952
+    end_velocity: 421.952
+    start_altitude: 1500
+    end_altitude: 10000
+  climb_5:
+    run_sim: True
+    segment_type: climb
+    start_velocity: 421.952
+    end_velocity: 518.427675
+    start_altitude: 10000
+    end_altitude: 20000
+  cruise_diversion:
+    segment_type: cruise
+    mach: .5003
+    altitude: 20000
+    range: 150
+    find_range: False
+  descent_2:
+    segment_type: descent
+    weight_fraction: .998
+  loiter:
+    segment_type: loiter
+    altitude: 1500
+    time: .5
+    mach: .25
+  descent_3:
+    segment_type: descent
+    weight_fraction: .999
+  landing:
+    segment_type: landing
+    weight_fraction: .995
+    reserve_fuel: .05
+
+

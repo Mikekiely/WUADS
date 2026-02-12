@@ -1,0 +1,49 @@
+Weights Report For Aircraft: b737-800
+================================================
+							Weight (lbs)
+						-------------------
+Takeoff Gross Weight: 		176250.83
+Maximum Takeoff Weight: 		176250.83
+Operating Empty Weight:		85437.33
+Fuel Weight:				46000.00
+
+Aircraft Center of Gravity - Empty (ft):	X:59.98, Y: 6.88, Z: -0.84
+Aircraft Center of Gravity - Full (ft):		X:61.77, Y: 3.20, Z: -0.39
+
+================================================
+          Structural Components
+
+						Weight (lbs)	X cg (ft)
+						--------------------------------
+Main Wing                  15393.20        60.97
+Horizontal Stabilizer       1801.72       121.68
+Vertical Stabilizer         1895.22       120.63
+Fuselage                   17633.38        62.38
+Nacelle                    13615.76        54.00
+
+================================================
+             Useful Load 
+
+			          Weight (lbs)			Number		x cg (ft)
+		            ---------------		-------------   -------
+Passengers              29700                   180       60.00
+Pilots                    330                     2        0.00
+Flight Attendants         660                     4        0.00
+Cargo                   15757                             60.00
+
+================================================
+          Subsystems
+
+                       Weight (lbs)   x cg (ft)
+------------------------------------------
+nose_landing_gear          634.05         15.00
+main_landing_gear         4228.94         69.30
+air_conditioning          1833.20         62.00
+anti_ice                     0.00         67.00
+apu                       1328.42        121.00
+avionics                  1200.00          9.00
+electronics               2368.37         12.00
+flight_controls           1626.54         83.05
+furnishings              13596.84         56.00
+hydraulics                1568.15         62.00
+instruments                336.43          9.00
