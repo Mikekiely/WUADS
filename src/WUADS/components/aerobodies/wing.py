@@ -146,7 +146,7 @@ class Wing(PhysicalComponent):
             else:
                 tc_list = self.airfoil_thickness
                 last_tc = tc_list[-1]
-                while len(tc_list) < len(self.airfoil_thickness):
+                while len(tc_list) < len(self.avl_sections):
                     tc_list.append(last_tc)
         else:
             while len(tc_list) < len(self.avl_sections):
@@ -224,7 +224,7 @@ class Wing(PhysicalComponent):
             else:
                 tc_list = self.airfoil_thickness
                 last_tc = tc_list[-1]
-                while len(tc_list) < len(self.airfoil_thickness):
+                while len(tc_list) < len(self.avl_sections):
                     tc_list.append(last_tc)
         else:
             while len(tc_list) < len(self.avl_sections):

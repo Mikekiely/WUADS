@@ -9,7 +9,7 @@ class Wing_Yehudi(Wing_advanced):
     def __init__(self, params):
         # Notes:
         # must define sweep by the leading edge
-
+        self.airfoil_thickness = [.1]
         self.params = params
 
         # Note: you define the trapezoidal reference wing the same way you would normally, with a seperate yehudi_span variable
