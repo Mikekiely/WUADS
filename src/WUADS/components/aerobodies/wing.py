@@ -159,7 +159,7 @@ class Wing(PhysicalComponent):
                 span = self.avl_sections[i+1][2] - self.avl_sections[i][2]
 
             n_strips_section = round(n_strips * (span / self.span))
-            dy = self.span / n_strips_section
+            dy = span / n_strips_section
 
             cr = self.avl_sections[i][3]
             ct = self.avl_sections[i+1][3]
@@ -169,7 +169,7 @@ class Wing(PhysicalComponent):
             sweep = np.arctan(dx/span)
 
             t = ct / cr
-            l_char = cr * (2 / 3) * ((1 + t + t ** 2) / (1 + t))
+
 
             # Airfoil thickness
             tc = np.linspace(tc_list[i], tc_list[i+1], n_strips_section)
@@ -177,10 +177,22 @@ class Wing(PhysicalComponent):
             for i in range(n_strips_section):
                 # From Raymer
                 form_factor = ((1 + tc[i] * .6 / xc + 100 * tc[i] ** 4) * (1.34 * mach ** .18 * (np.cos(sweep)) ** .28))
-                area = .5 * (chords[i] + chords[i+1]) * dy
+                # form_factor = ((1 + (2 - mach**2) * np.cos(self.sweep_quarter_chord) * tc[i] /
+                #                  np.sqrt(1 - mach**2 * np.cos(self.sweep_quarter_chord)**2)) +
+                #                  100 * tc[i]**4)
+                l_char = .5 * (chords[i] + chords[i+1])
+                area = l_char * dy * 2
+                # Set wetted surface area (Torenbeek - advanced aircraft design)
+                aspect_ratio = dy**2 / area
+                kq = 0.95
+                t = chords[i+1] / chords[i]
+                l_char = chords[i] * (2 / 3) * ((1 + t + t ** 2) / (1 + t))
+
+                Qw = kq * tc[i] * area * np.sqrt(area / aspect_ratio) / np.sqrt(1 + t)
+                s_wet = (2 + .5 * tc[i]) * (Qw * np.sqrt(aspect_ratio * (1 + t)) / (kq * tc[i])) ** (2 / 3)
 
                 # TODO Add shevell method
-                self.cd0 += 2 * super().parasite_drag(form_factor, l_char, flight_conditions, sref) * area / sref
+                self.cd0 += super().parasite_drag(form_factor, l_char, flight_conditions, sref) * s_wet / self.s_wet
 
     def set_wave_drag(self, aircraft, flight_conditions=None):
         """
@@ -235,7 +247,7 @@ class Wing(PhysicalComponent):
             if span == 0:
                 span = self.avl_sections[i + 1][2] - self.avl_sections[i][2]
 
-            n_strips_section = round(n_strips * (span / span))
+            n_strips_section = round(n_strips * (span / (.5*self.span)))
             dy = span / n_strips_section
 
             cr = self.avl_sections[i][3]
@@ -246,7 +258,7 @@ class Wing(PhysicalComponent):
             dx = self.avl_sections[i + 1][0] - self.avl_sections[i][0]
             sweep = np.arctan(dx / span)
             yle = self.avl_sections[i][1]
-            y_dist = np.linspace(yle, yle + span, n_strips)
+            y_dist = np.linspace(yle, yle + span, n_strips_section)
 
             for j in range(n_strips_section):
                 cr_i = chords[j]
@@ -266,7 +278,7 @@ class Wing(PhysicalComponent):
 
                 # Set section wave drag coefficient if applicable
                 if m > mcr:
-                    cdw += 20 * (m - mcr) ** 4 * (area / aircraft.sref)
+                    cdw += 20 * (m - mcr) ** 4 * (area / aircraft.sref) * 2
 
         self.cdw = cdw
         return cdw
