@@ -66,8 +66,12 @@ class Wing_Yehudi(Wing_advanced):
 
         super().__init__(params)
         self.component_type = 'wing_advanced'
+        self.area = 0
+        for sec in self.sections:
+            sec_area = .5 * (sec.cr + sec.ct) * sec.span
+            self.area += sec_area
 
     def update(self, variable, value, **kwargs):
         params = self.params
         params[variable] = value
-        self.__dict__.update(params)
+        self.__init__(params)
