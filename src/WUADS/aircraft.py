@@ -7,7 +7,7 @@ from .components.component import Component
 from .components.subsystems import Subsystems
 from .mission import Mission
 from .components.usefulload import UsefulLoad
-from .propulsion import turbofan, propeller
+from .propulsion import turbofan, propeller, turboprop
 from .mission_segments import *
 from .flight_conditions import FlightConditions
 from .components.aerobodies.wing import Wing
